@@ -15,6 +15,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PlayerAttacksEntityListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.util.RotationUtils;
 
 @SearchTags({"mace dmg", "MaceDamage", "mace damage"})
 public final class MaceDmgHack extends Hack
@@ -55,6 +56,10 @@ public final class MaceDmgHack extends Hack
 			sendFakeY(0);
 		sendFakeY(Math.sqrt(500));
 		sendFakeY(0);
+
+		RotationUtils
+				.getNeededRotations(target.getBoundingBox().getCenter())
+				.sendPlayerLookPacket();
 	}
 	
 	private void sendFakeY(double offset)
