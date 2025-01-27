@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Wurst-Imperium and contributors.
+ * Copyright (c) 2014-2025 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -29,11 +29,11 @@ public abstract class BlockRenderInfoMixin
 	public BlockState blockState;
 	
 	/**
-	 * This mixin hides and shows regular blocks when using X-Ray without Sodium
-	 * installed.
+	 * This mixin hides and shows regular blocks when using X-Ray, if Indigo
+	 * is running and Sodium is not installed.
 	 */
-	@Inject(at = @At("HEAD"), method = "shouldDrawFace", cancellable = true)
-	private void onShouldDrawFace(Direction face,
+	@Inject(at = @At("HEAD"), method = "shouldDrawSide", cancellable = true)
+	private void onShouldDrawSide(Direction face,
 		CallbackInfoReturnable<Boolean> cir)
 	{
 		ShouldDrawSideEvent event =
