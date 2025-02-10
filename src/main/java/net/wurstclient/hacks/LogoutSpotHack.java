@@ -8,9 +8,9 @@
 package net.wurstclient.hacks;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -24,24 +24,24 @@ import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @SearchTags({"logout", "player out", "logout spot"})
 public final class LogoutSpotHack extends Hack
 	implements UpdateListener, RenderListener
 {
-	record LogoutEntry(UUID uuid, Vec3d position)
+	record Entry(UUID uuid, Vec3d position)
 	{}
 	
 	private final EspBoxSizeSetting boxSize = new EspBoxSizeSetting(
 		"\u00a7lAccurate\u00a7r mode shows the exact hitbox of each player.\n"
 			+ "\u00a7lFancy\u00a7r mode shows slightly larger boxes that look better.");
 	
-	private final ArrayList<PlayerEntity> lastPlayers = new ArrayList<>();
-	private final ArrayList<LogoutEntry> logoutEntries = new ArrayList<>();
+	private Map<UUID, String> onlinePlayers = new HashMap<>();
+	private Map<UUID, Vec3d> renderPlayers = new HashMap<>();
+	private Map<UUID, String> lastPlayers = new HashMap<>();
+	private final Map<UUID, Entry> logOutPlayers = new HashMap<>();
 	
 	public LogoutSpotHack()
 	{
@@ -65,32 +65,56 @@ public final class LogoutSpotHack extends Hack
 		EVENTS.remove(RenderListener.class, this);
 	}
 	
+	/*
+	 * 1. 전체 플레이어를 가져온다.
+	 * 2. 플레이어 변화가 없으면 스킵한다.
+	 * 3. 이전 플레이어(lastPlayers) 중 현재 온라인 플레이어(onlinePlayers)에 없는 플레이어를 찾는다.
+	 * 단, 해당 플레이어가 렌더링되고 있는 경우(renderPlayers에 존재하면) 그 위치 정보로 logoutEntries에
+	 * 추가한다.
+	 * 4. logoutEntries에서 렌더링되지 않는 항목은 제거한다.
+	 * 5. 마지막에 lastPlayers를 현재 onlinePlayers의 모든 UUID로 교체한다.
+	 */
 	@Override
 	public void onUpdate()
 	{
+		// System.out.println("lastPlayers > " + lastPlayers);
 		
-		ArrayList<PlayerEntity> currentPlayers = new ArrayList<>();
-		Stream<AbstractClientPlayerEntity> stream = MC.world.getPlayers()
-			.parallelStream().filter(e -> !(e instanceof FakePlayerEntity));
-		currentPlayers.addAll(stream.collect(Collectors.toList()));
+		// 온라인 플레이어 목록 (네트워크 탭 리스트)
+		onlinePlayers = MinecraftClient.getInstance().getNetworkHandler()
+			.getPlayerList().stream()
+			.collect(Collectors.toMap(entry -> entry.getProfile().getId(),
+				entry -> entry.getProfile().getName()));
+		// System.out.println("onlinePlayers > " + onlinePlayers);
 		
-		logoutEntries.removeIf(logoutPlayer -> currentPlayers.stream()
-			.anyMatch(onlinePlayer -> onlinePlayer.getUuid()
-				.equals(logoutPlayer.uuid())));
+		// 온라인 플레이어에 재접속한 경우, logOutPlayers에서 제거
+		logOutPlayers.entrySet()
+			.removeIf(entry -> onlinePlayers.containsKey(entry.getKey()));
 		
-		for(PlayerEntity p : lastPlayers)
+		// 플레이어 수 변화가 없으면 업데이트를 스킵
+		if(onlinePlayers.size() == lastPlayers.size())
 		{
-			boolean isOnline = currentPlayers.stream().anyMatch(
-				onlinePlayer -> onlinePlayer.getUuid().equals(p.getUuid()));
-			
-			if(!isOnline)
-			{
-				logoutEntries.add(new LogoutEntry(p.getUuid(), p.getPos()));
-			}
+			// 현재 월드에서 렌더링되고 있는 플레이어 목록 (FakePlayer 제외)
+			renderPlayers = MC.world.getPlayers().parallelStream()
+				.filter(e -> !(e instanceof FakePlayerEntity))
+				.collect(Collectors.toMap(Entity::getUuid, Entity::getPos));
+			// System.out.println("renderPlayers > " + renderPlayers);
+			return;
 		}
 		
+		for(UUID uuid : lastPlayers.keySet())
+		{
+			if(!onlinePlayers.containsKey(uuid))
+			{ // 서버에 없는 플레이어라면
+				System.out.println(renderPlayers.get(uuid));
+				Optional.ofNullable(renderPlayers.get(uuid)).ifPresent(
+					pos -> logOutPlayers.put(uuid, new Entry(uuid, pos)));
+			}
+		}
+		// System.out.println("logOutPlayers > " + logOutPlayers);
+		
+		// 마지막에 lastPlayers를 onlinePlayers의 모든 UUID로 갱신
 		lastPlayers.clear();
-		lastPlayers.addAll(currentPlayers);
+		lastPlayers = onlinePlayers;
 	}
 	
 	@Override
@@ -107,7 +131,7 @@ public final class LogoutSpotHack extends Hack
 		
 		float extraSize = boxSize.getExtraSize();
 		
-		for(LogoutEntry entry : logoutEntries)
+		for(Entry entry : logOutPlayers.values())
 		{
 			matrixStack.push();
 			
