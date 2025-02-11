@@ -140,9 +140,9 @@ public final class MassTpaHack extends Hack
 			sendTpaCount = 0;
 			
 			if(command.equals("tpa"))
-				command = "tpacancel";
+				command = "tpahere";
 			
-			else if(command.equals("tpacancel"))
+			else if(command.equals("tpahere"))
 				command = "tpa";
 		}
 		
