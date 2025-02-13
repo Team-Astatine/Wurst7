@@ -57,7 +57,7 @@ public final class MaceDmgHack extends Hack
 		int availableHeight = getMaximumHeight(MC.player);
 		if(availableHeight < 25)
 		{
-			ChatUtils.message(availableHeight + "만큼 높이가 부족합니다.");
+ 			ChatUtils.message(25 - availableHeight + "만큼 높이가 부족합니다.");
 			return;
 		}
 		
@@ -66,7 +66,7 @@ public final class MaceDmgHack extends Hack
 		// Also, let me know if you find a way to bypass that check in 1.21.
 		for(int i = 0; i < 4; i++)
 			sendFakeY(0);
-		sendFakeY(Math.sqrt(500));
+		sendFakeY(Math.sqrt(getMaximumHeight(MC.player)));
 		sendFakeY(0);
 	}
 	
