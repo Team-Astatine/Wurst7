@@ -24,14 +24,17 @@ import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import org.lwjgl.opengl.GL11;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @SearchTags({"logout", "player out", "logout spot"})
 public final class LogoutSpotHack extends Hack
 	implements UpdateListener, RenderListener
 {
-	record Entry(UUID uuid, Vec3d position)
+	record Entry(UUID uuid, Vec3d position, Instant instant)
 	{}
 	
 	private final EspBoxSizeSetting boxSize = new EspBoxSizeSetting(
@@ -47,6 +50,12 @@ public final class LogoutSpotHack extends Hack
 	{
 		super("LogOutSpot");
 		setCategory(Category.RENDER);
+		
+		scheduler.scheduleWithFixedDelay(
+			() -> logOutPlayers.entrySet().removeIf(entry -> Instant.now()
+				.isAfter(entry.getValue().instant.plus(10, ChronoUnit.MINUTES)))
+			
+			, 0, 5, TimeUnit.MINUTES);
 		
 		addSetting(boxSize);
 	}
@@ -106,8 +115,9 @@ public final class LogoutSpotHack extends Hack
 			if(!onlinePlayers.containsKey(uuid))
 			{ // 서버에 없는 플레이어라면
 				System.out.println(renderPlayers.get(uuid));
-				Optional.ofNullable(renderPlayers.get(uuid)).ifPresent(
-					pos -> logOutPlayers.put(uuid, new Entry(uuid, pos)));
+				Optional.ofNullable(renderPlayers.get(uuid))
+					.ifPresent(pos -> logOutPlayers.put(uuid,
+						new Entry(uuid, pos, Instant.now())));
 			}
 		}
 		// System.out.println("logOutPlayers > " + logOutPlayers);
@@ -137,12 +147,18 @@ public final class LogoutSpotHack extends Hack
 			
 			Vec3d outPosition = entry.position().subtract(region.toVec3d());
 			matrixStack.translate(outPosition.x, outPosition.y, outPosition.z);
-			
 			matrixStack.scale(1 + extraSize, 1 + extraSize, 1 + extraSize);
 			
-			RenderSystem.setShaderColor(0, 1, 1, 0.5F);
-			
 			Box logoutBox = new Box(-0.5, 0, -0.5, 0.5, 2, 0.5);
+			
+			// 채워진 박스 그리기 (투명도 0.1)
+			RenderSystem.setShaderColor(0, 1, 1, 0.1F);
+			RenderUtils.drawSolidBox(logoutBox, matrixStack); // drawFilledBox
+																// 또는 해당하는 메서드
+																// 사용
+			
+			// 윤곽선 박스 그리기 (투명도 0.75)
+			RenderSystem.setShaderColor(0, 1, 1, 0.1F);
 			RenderUtils.drawOutlinedBox(logoutBox, matrixStack);
 			
 			matrixStack.pop();
