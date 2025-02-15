@@ -57,7 +57,7 @@ public final class MaceDmgHack extends Hack
 		int availableHeight = getMaximumHeight(MC.player);
 		if(availableHeight < 25)
 		{
- 			ChatUtils.message(25 - availableHeight + "만큼 높이가 부족합니다.");
+			ChatUtils.message(25 - availableHeight + "만큼 높이가 부족합니다.");
 			return;
 		}
 		
