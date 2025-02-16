@@ -71,6 +71,23 @@ public enum RenderUtils
 				.cull(RenderLayer.DISABLE_CULLING).build(false));
 	
 	/**
+	 * Similar to {@link RenderLayer#getLines()}, but with line width 2 and no
+	 * depth test.
+	 */
+	public static final RenderLayer.MultiPhase ESP_LINES =
+		RenderLayer.of("wurst:esp_lines", VertexFormats.LINES,
+			VertexFormat.DrawMode.LINES, 1536, false, true,
+			RenderLayer.MultiPhaseParameters.builder()
+				.program(RenderLayer.LINES_PROGRAM)
+				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
+				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
+				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
+				.target(RenderLayer.ITEM_ENTITY_TARGET)
+				.writeMaskState(RenderLayer.ALL_MASK)
+				.depthTest(RenderLayer.ALWAYS_DEPTH_TEST)
+				.cull(RenderLayer.DISABLE_CULLING).build(false));
+	
+	/**
 	 * Enables a new scissor box with the given coordinates, while avoiding the
 	 * strange side-effects of Minecraft's own enableScissor() method.
 	 */
@@ -912,6 +929,64 @@ public enum RenderUtils
 				buffer.vertex(matrix, vertex[0], vertex[1], 1).color(color);
 			buffer.vertex(matrix, vertices[0][0], vertices[0][1], 1)
 				.color(color);
+		});
+	}
+	
+	/**
+	 * Draws a box shadow around the given rectangle.
+	 */
+	public static void drawBoxShadow2D(DrawContext context, int x1, int y1,
+		int x2, int y2)
+	{
+		float[] acColor = WurstClient.INSTANCE.getGui().getAcColor();
+		
+		// outline
+		float xo1 = x1 - 0.1F;
+		float xo2 = x2 + 0.1F;
+		float yo1 = y1 - 0.1F;
+		float yo2 = y2 + 0.1F;
+		
+		int outlineColor = toIntColor(acColor, 0.5F);
+		drawBorder2D(context, xo1, yo1, xo2, yo2, outlineColor);
+		
+		// shadow
+		float xs1 = x1 - 1;
+		float xs2 = x2 + 1;
+		float ys1 = y1 - 1;
+		float ys2 = y2 + 1;
+		
+		int shadowColor1 = toIntColor(acColor, 0.75F);
+		int shadowColor2 = 0x00000000;
+		
+		MatrixStack matrixStack = context.getMatrices();
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		
+		context.draw(consumers -> {
+			VertexConsumer buffer = consumers.getBuffer(RenderLayer.getGui());
+			
+			// top
+			buffer.vertex(matrix, x1, y1, 0).color(shadowColor1);
+			buffer.vertex(matrix, x2, y1, 0).color(shadowColor1);
+			buffer.vertex(matrix, xs2, ys1, 0).color(shadowColor2);
+			buffer.vertex(matrix, xs1, ys1, 0).color(shadowColor2);
+			
+			// left
+			buffer.vertex(matrix, xs1, ys1, 0).color(shadowColor2);
+			buffer.vertex(matrix, xs1, ys2, 0).color(shadowColor2);
+			buffer.vertex(matrix, x1, y2, 0).color(shadowColor1);
+			buffer.vertex(matrix, x1, y1, 0).color(shadowColor1);
+			
+			// right
+			buffer.vertex(matrix, x2, y1, 0).color(shadowColor1);
+			buffer.vertex(matrix, x2, y2, 0).color(shadowColor1);
+			buffer.vertex(matrix, xs2, ys2, 0).color(shadowColor2);
+			buffer.vertex(matrix, xs2, ys1, 0).color(shadowColor2);
+			
+			// bottom
+			buffer.vertex(matrix, x2, y2, 0).color(shadowColor1);
+			buffer.vertex(matrix, x1, y2, 0).color(shadowColor1);
+			buffer.vertex(matrix, xs1, ys2, 0).color(shadowColor2);
+			buffer.vertex(matrix, xs2, ys2, 0).color(shadowColor2);
 		});
 	}
 }
