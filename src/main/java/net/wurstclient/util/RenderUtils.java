@@ -7,8 +7,6 @@
  */
 package net.wurstclient.util;
 
-import java.util.OptionalDouble;
-
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -20,7 +18,6 @@ import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.VertexFormat.DrawMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -29,93 +26,13 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.Chunk;
 import net.wurstclient.WurstClient;
+import net.wurstclient.WurstRenderLayers;
 
 public enum RenderUtils
 {
 	;
 	
 	private static final Box DEFAULT_BOX = new Box(0, 0, 0, 1, 1, 1);
-	
-	/**
-	 * Similar to {@link RenderLayer#getDebugLineStrip(double)}, but as a
-	 * non-srip version with support for transparency.
-	 *
-	 * @implNote Just like {@link RenderLayer#getDebugLineStrip(double)}, this
-	 *           layer doesn't support any other line width than 1px. Changing
-	 *           the line width number does nothing.
-	 */
-	public static final RenderLayer.MultiPhase ONE_PIXEL_LINES =
-		RenderLayer.of("wurst:1px_lines", VertexFormats.POSITION_COLOR,
-			DrawMode.DEBUG_LINES, 1536, false, true,
-			RenderLayer.MultiPhaseParameters.builder()
-				.program(RenderLayer.POSITION_COLOR_PROGRAM)
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
-				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
-				.cull(RenderLayer.DISABLE_CULLING).build(false));
-	
-	/**
-	 * Similar to {@link RenderLayer#getDebugLineStrip(double)}, but with
-	 * support for transparency.
-	 *
-	 * @implNote Just like {@link RenderLayer#getDebugLineStrip(double)}, this
-	 *           layer doesn't support any other line width than 1px. Changing
-	 *           the line width number does nothing.
-	 */
-	public static final RenderLayer.MultiPhase ONE_PIXEL_LINE_STRIP =
-		RenderLayer.of("wurst:1px_line_strip", VertexFormats.POSITION_COLOR,
-			DrawMode.DEBUG_LINE_STRIP, 1536, false, true,
-			RenderLayer.MultiPhaseParameters.builder()
-				.program(RenderLayer.POSITION_COLOR_PROGRAM)
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1)))
-				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
-				.cull(RenderLayer.DISABLE_CULLING).build(false));
-	
-	/**
-	 * Similar to {@link RenderLayer#getLines()}, but with line width 2 and no
-	 * depth test.
-	 */
-	public static final RenderLayer.MultiPhase ESP_LINES =
-		RenderLayer.of("wurst:esp_lines", VertexFormats.LINES,
-			VertexFormat.DrawMode.LINES, 1536, false, true,
-			RenderLayer.MultiPhaseParameters.builder()
-				.program(RenderLayer.LINES_PROGRAM)
-				.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2)))
-				.layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
-				.transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
-				.target(RenderLayer.ITEM_ENTITY_TARGET)
-				.writeMaskState(RenderLayer.ALL_MASK)
-				.depthTest(RenderLayer.ALWAYS_DEPTH_TEST)
-				.cull(RenderLayer.DISABLE_CULLING).build(false));
-	
-	/**
-	 * Enables a new scissor box with the given coordinates, while avoiding the
-	 * strange side-effects of Minecraft's own enableScissor() method.
-	 */
-	public static void enableScissor(DrawContext context, int x1, int y1,
-		int x2, int y2)
-	{
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		context.enableScissor(x1, y1, x2, y2);
-		RenderSystem.setShader(ShaderProgramKeys.POSITION);
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-	}
-	
-	/**
-	 * Disables the current scissor box, while avoiding most of the strange
-	 * side-effects of Minecraft's own disableScissor() method.
-	 *
-	 * <p>
-	 * <b>Note:</b> You have to draw some text after calling this method,
-	 * otherwise there will be some weird colors in the sky. It's unclear why
-	 * this happens.
-	 */
-	public static void disableScissor(DrawContext context)
-	{
-		context.disableScissor();
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-	}
 	
 	public static void applyRegionalRenderOffset(MatrixStack matrixStack)
 	{
@@ -187,6 +104,22 @@ public enum RenderUtils
 			| (int)(MathHelper.clamp(rgb[0], 0, 1) * 255) << 16
 			| (int)(MathHelper.clamp(rgb[1], 0, 1) * 255) << 8
 			| (int)(MathHelper.clamp(rgb[2], 0, 1) * 255);
+	}
+	
+	public static void drawLine(MatrixStack matrices, VertexConsumer buffer,
+		Vec3d start, Vec3d end, int color)
+	{
+		drawLine(matrices, buffer, start.toVector3f(), end.toVector3f(), color);
+	}
+	
+	public static void drawLine(MatrixStack matrices, VertexConsumer buffer,
+		Vector3f start, Vector3f end, int color)
+	{
+		MatrixStack.Entry entry = matrices.peek();
+		Vector3f normal = new Vector3f(end).sub(start).normalize();
+		
+		buffer.vertex(entry, start).color(color).normal(entry, normal);
+		buffer.vertex(entry, end).color(color).normal(entry, normal);
 	}
 	
 	public static void drawSolidBox(MatrixStack matrixStack)
@@ -293,6 +226,48 @@ public enum RenderUtils
 		bufferBuilder.vertex(minX, minY, maxZ);
 		bufferBuilder.vertex(minX, maxY, maxZ);
 		bufferBuilder.vertex(minX, maxY, minZ);
+	}
+	
+	public static void drawOutlinedBox(MatrixStack matrices,
+		VertexConsumer buffer, Box box, int color)
+	{
+		MatrixStack.Entry entry = matrices.peek();
+		float x1 = (float)box.minX;
+		float y1 = (float)box.minY;
+		float z1 = (float)box.minZ;
+		float x2 = (float)box.maxX;
+		float y2 = (float)box.maxY;
+		float z2 = (float)box.maxZ;
+		
+		// bottom lines
+		buffer.vertex(entry, x1, y1, z1).color(color).normal(entry, 1, 0, 0);
+		buffer.vertex(entry, x2, y1, z1).color(color).normal(entry, 1, 0, 0);
+		buffer.vertex(entry, x1, y1, z1).color(color).normal(entry, 0, 0, 1);
+		buffer.vertex(entry, x1, y1, z2).color(color).normal(entry, 0, 0, 1);
+		buffer.vertex(entry, x2, y1, z1).color(color).normal(entry, 0, 0, 1);
+		buffer.vertex(entry, x2, y1, z2).color(color).normal(entry, 0, 0, 1);
+		buffer.vertex(entry, x1, y1, z2).color(color).normal(entry, 1, 0, 0);
+		buffer.vertex(entry, x2, y1, z2).color(color).normal(entry, 1, 0, 0);
+		
+		// top lines
+		buffer.vertex(entry, x1, y2, z1).color(color).normal(entry, 1, 0, 0);
+		buffer.vertex(entry, x2, y2, z1).color(color).normal(entry, 1, 0, 0);
+		buffer.vertex(entry, x1, y2, z1).color(color).normal(entry, 0, 0, 1);
+		buffer.vertex(entry, x1, y2, z2).color(color).normal(entry, 0, 0, 1);
+		buffer.vertex(entry, x2, y2, z1).color(color).normal(entry, 0, 0, 1);
+		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, 0, 0, 1);
+		buffer.vertex(entry, x1, y2, z2).color(color).normal(entry, 1, 0, 0);
+		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, 1, 0, 0);
+		
+		// side lines
+		buffer.vertex(entry, x1, y1, z1).color(color).normal(entry, 0, 1, 0);
+		buffer.vertex(entry, x1, y2, z1).color(color).normal(entry, 0, 1, 0);
+		buffer.vertex(entry, x2, y1, z1).color(color).normal(entry, 0, 1, 0);
+		buffer.vertex(entry, x2, y2, z1).color(color).normal(entry, 0, 1, 0);
+		buffer.vertex(entry, x1, y1, z2).color(color).normal(entry, 0, 1, 0);
+		buffer.vertex(entry, x1, y2, z2).color(color).normal(entry, 0, 1, 0);
+		buffer.vertex(entry, x2, y1, z2).color(color).normal(entry, 0, 1, 0);
+		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, 0, 1, 0);
 	}
 	
 	public static void drawOutlinedBox(MatrixStack matrixStack)
@@ -890,7 +865,8 @@ public enum RenderUtils
 	{
 		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
 		context.draw(consumers -> {
-			VertexConsumer buffer = consumers.getBuffer(ONE_PIXEL_LINES);
+			VertexConsumer buffer =
+				consumers.getBuffer(WurstRenderLayers.ONE_PIXEL_LINES);
 			buffer.vertex(matrix, x1, y1, 1).color(color);
 			buffer.vertex(matrix, x2, y2, 1).color(color);
 		});
@@ -907,7 +883,8 @@ public enum RenderUtils
 	{
 		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
 		context.draw(consumers -> {
-			VertexConsumer buffer = consumers.getBuffer(ONE_PIXEL_LINE_STRIP);
+			VertexConsumer buffer =
+				consumers.getBuffer(WurstRenderLayers.ONE_PIXEL_LINE_STRIP);
 			buffer.vertex(matrix, x1, y1, 1).color(color);
 			buffer.vertex(matrix, x2, y1, 1).color(color);
 			buffer.vertex(matrix, x2, y2, 1).color(color);
@@ -924,7 +901,8 @@ public enum RenderUtils
 	{
 		Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
 		context.draw(consumers -> {
-			VertexConsumer buffer = consumers.getBuffer(ONE_PIXEL_LINE_STRIP);
+			VertexConsumer buffer =
+				consumers.getBuffer(WurstRenderLayers.ONE_PIXEL_LINE_STRIP);
 			for(float[] vertex : vertices)
 				buffer.vertex(matrix, vertex[0], vertex[1], 1).color(color);
 			buffer.vertex(matrix, vertices[0][0], vertices[0][1], 1)

@@ -17,7 +17,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexRendering;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -26,6 +25,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
@@ -127,8 +127,6 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		// GL settings
-		RenderSystem.enableDepthTest();
 		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
 		
 		VertexConsumerProvider.Immediate vcp =
@@ -147,10 +145,7 @@ public final class MobEspHack extends Hack implements UpdateListener,
 		
 		matrixStack.pop();
 		
-		vcp.draw(RenderUtils.ESP_LINES);
-		
-		// GL resets
-		RenderSystem.disableDepthTest();
+		vcp.draw(WurstRenderLayers.ESP_LINES);
 	}
 	
 	private void renderBoxes(MatrixStack matrixStack,
@@ -158,24 +153,21 @@ public final class MobEspHack extends Hack implements UpdateListener,
 	{
 		double extraSize = boxSize.getExtraSize() / 2;
 		Vec3d offset = region.negate().toVec3d().add(0, extraSize, 0);
-		VertexConsumer buffer = vcp.getBuffer(RenderUtils.ESP_LINES);
+		VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
 		
 		for(LivingEntity e : mobs)
 		{
-			float f = MC.player.distanceTo(e) / 20F;
-			float r = MathHelper.clamp(2 - f, 0, 1);
-			float g = MathHelper.clamp(f, 0, 1);
-			
 			Box box = EntityUtils.getLerpedBox(e, partialTicks).offset(offset)
 				.expand(extraSize);
-			VertexRendering.drawBox(matrixStack, buffer, box, r, g, 0, 0.5F);
+			
+			RenderUtils.drawOutlinedBox(matrixStack, buffer, box, getColor(e));
 		}
 	}
 	
 	private void renderTracers(MatrixStack matrixStack,
 		VertexConsumerProvider vcp, float partialTicks, RegionPos region)
 	{
-		VertexConsumer buffer = vcp.getBuffer(RenderUtils.ESP_LINES);
+		VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
 		
 		Vec3d regionVec = region.toVec3d();
 		Vec3d start = RotationUtils.getClientLookVec(partialTicks).multiply(2)
@@ -186,13 +178,16 @@ public final class MobEspHack extends Hack implements UpdateListener,
 			Vec3d end = EntityUtils.getLerpedBox(e, partialTicks).getCenter()
 				.subtract(regionVec);
 			
-			float f = MC.player.distanceTo(e) / 20F;
-			float r = MathHelper.clamp(2 - f, 0, 1);
-			float g = MathHelper.clamp(f, 0, 1);
-			
-			int color = RenderUtils.toIntColor(new float[]{r, g, 0}, 0.5F);
-			VertexRendering.drawVector(matrixStack, buffer, start.toVector3f(),
-				end.subtract(start), color);
+			RenderUtils.drawLine(matrixStack, buffer, start, end, getColor(e));
 		}
+	}
+	
+	private int getColor(LivingEntity e)
+	{
+		float f = MC.player.distanceTo(e) / 20F;
+		float r = MathHelper.clamp(2 - f, 0, 1);
+		float g = MathHelper.clamp(f, 0, 1);
+		float[] rgb = {r, g, 0};
+		return RenderUtils.toIntColor(rgb, 0.5F);
 	}
 }
