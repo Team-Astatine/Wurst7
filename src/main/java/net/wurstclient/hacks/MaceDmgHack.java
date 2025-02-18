@@ -83,7 +83,8 @@ public final class MaceDmgHack extends Hack
 				.getBlockState(blockPos).getBlock();
 			
 			if(block == Blocks.AIR || block == Blocks.VOID_AIR
-				|| block == Blocks.WATER || block == Blocks.LAVA)
+				|| block == Blocks.WATER || block == Blocks.LAVA
+				|| block == Blocks.TALL_GRASS || block == Blocks.COBWEB)
 				maxAvailableHeight++;
 			
 			else
