@@ -73,7 +73,7 @@ public final class ArrowDmgHack extends Hack implements StopUsingItemListener
 		// See ServerPlayNetworkHandler.onPlayerMove()
 		// for why it's using these numbers.
 		// Also, let me know if you find a way to bypass that check in 1.21.
-		double adjustedStrength = strength.getValue() / 10.0 * Math.sqrt(500);
+		double adjustedStrength = strength.getValue() / 10.0 * Math.sqrt(300);
 		Vec3d lookVec = player.getRotationVec(1).multiply(adjustedStrength);
 		for(int i = 0; i < 4; i++)
 			sendPos(x, y, z, true);
