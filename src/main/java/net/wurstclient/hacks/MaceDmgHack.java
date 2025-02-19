@@ -14,13 +14,11 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket.PositionAndOnGround;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PlayerAttacksEntityListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.util.ChatUtils;
 
 @SearchTags({"mace dmg", "MaceDamage", "mace damage"})
 public final class MaceDmgHack extends Hack
@@ -49,7 +47,7 @@ public final class MaceDmgHack extends Hack
 	{
 		if(!MC.player.getMainHandStack().isOf(Items.MACE))
 			return;
-
+		
 		for(int i = 0; i < 4; i++)
 			sendFakeY(0);
 		sendFakeY(Math.sqrt(300));
