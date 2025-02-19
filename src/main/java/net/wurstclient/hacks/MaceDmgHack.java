@@ -47,26 +47,12 @@ public final class MaceDmgHack extends Hack
 	@Override
 	public void onPlayerAttacksEntity(Entity target)
 	{
-		if(MC.crosshairTarget == null
-			|| MC.crosshairTarget.getType() != HitResult.Type.ENTITY)
-			return;
-		
 		if(!MC.player.getMainHandStack().isOf(Items.MACE))
 			return;
-		
-		int availableHeight = getMaximumHeight(MC.player);
-		if(availableHeight < 25)
-		{
-			ChatUtils.message(25 - availableHeight + "만큼 높이가 부족합니다.");
-			return;
-		}
-		
-		// See ServerPlayNetworkHandler.onPlayerMove()
-		// for why it's using these numbers.
-		// Also, let me know if you find a way to bypass that check in 1.21.
+
 		for(int i = 0; i < 4; i++)
 			sendFakeY(0);
-		sendFakeY(Math.sqrt(getMaximumHeight(MC.player)));
+		sendFakeY(Math.sqrt(300));
 		sendFakeY(0);
 	}
 	
@@ -84,7 +70,8 @@ public final class MaceDmgHack extends Hack
 			
 			if(block == Blocks.AIR || block == Blocks.VOID_AIR
 				|| block == Blocks.WATER || block == Blocks.LAVA
-				|| block == Blocks.TALL_GRASS || block == Blocks.COBWEB)
+				|| block == Blocks.TALL_GRASS || block == Blocks.GLASS
+				|| block == Blocks.COBWEB || block == Blocks.SHORT_GRASS)
 				maxAvailableHeight++;
 			
 			else
