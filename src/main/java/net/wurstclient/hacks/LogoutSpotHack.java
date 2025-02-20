@@ -18,7 +18,6 @@ import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.EspBoxSizeSetting;
 import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
@@ -37,10 +36,6 @@ public final class LogoutSpotHack extends Hack
 	record Entry(UUID uuid, Vec3d position, Instant instant)
 	{}
 	
-	private final EspBoxSizeSetting boxSize = new EspBoxSizeSetting(
-		"\u00a7lAccurate\u00a7r mode shows the exact hitbox of each player.\n"
-			+ "\u00a7lFancy\u00a7r mode shows slightly larger boxes that look better.");
-	
 	private Map<UUID, String> onlinePlayers = new HashMap<>();
 	private Map<UUID, Vec3d> renderPlayers = new HashMap<>();
 	private Map<UUID, String> lastPlayers = new HashMap<>();
@@ -52,12 +47,10 @@ public final class LogoutSpotHack extends Hack
 		setCategory(Category.RENDER);
 		
 		scheduler.scheduleWithFixedDelay(
-			() -> logOutPlayers.entrySet().removeIf(entry -> Instant.now()
-				.isAfter(entry.getValue().instant.plus(10, ChronoUnit.MINUTES)))
-			
-			, 0, 5, TimeUnit.MINUTES);
-		
-		addSetting(boxSize);
+			() -> logOutPlayers.entrySet()
+				.removeIf(entry -> Instant.now().isAfter(
+					entry.getValue().instant.plus(10, ChronoUnit.MINUTES))),
+			0, 5, TimeUnit.MINUTES);
 	}
 	
 	@Override
@@ -86,14 +79,11 @@ public final class LogoutSpotHack extends Hack
 	@Override
 	public void onUpdate()
 	{
-		// System.out.println("lastPlayers > " + lastPlayers);
-		
 		// 온라인 플레이어 목록 (네트워크 탭 리스트)
 		onlinePlayers = MinecraftClient.getInstance().getNetworkHandler()
 			.getPlayerList().stream()
 			.collect(Collectors.toMap(entry -> entry.getProfile().getId(),
 				entry -> entry.getProfile().getName()));
-		// System.out.println("onlinePlayers > " + onlinePlayers);
 		
 		// 온라인 플레이어에 재접속한 경우, logOutPlayers에서 제거
 		logOutPlayers.entrySet()
@@ -106,7 +96,6 @@ public final class LogoutSpotHack extends Hack
 			renderPlayers = MC.world.getPlayers().parallelStream()
 				.filter(e -> !(e instanceof FakePlayerEntity))
 				.collect(Collectors.toMap(Entity::getUuid, Entity::getPos));
-			// System.out.println("renderPlayers > " + renderPlayers);
 			return;
 		}
 		
@@ -120,7 +109,6 @@ public final class LogoutSpotHack extends Hack
 						new Entry(uuid, pos, Instant.now())));
 			}
 		}
-		// System.out.println("logOutPlayers > " + logOutPlayers);
 		
 		// 마지막에 lastPlayers를 onlinePlayers의 모든 UUID로 갱신
 		lastPlayers.clear();
@@ -138,30 +126,21 @@ public final class LogoutSpotHack extends Hack
 		
 		RegionPos region = RenderUtils.getCameraRegion();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-		
-		float extraSize = boxSize.getExtraSize();
+		Box logoutBox = new Box(-0.5, 0, -0.5, 0.5, 2, 0.5);
 		
 		for(Entry entry : logOutPlayers.values())
 		{
-			matrixStack.push();
-			
 			Vec3d outPosition = entry.position().subtract(region.toVec3d());
 			matrixStack.translate(outPosition.x, outPosition.y, outPosition.z);
-			matrixStack.scale(1 + extraSize, 1 + extraSize, 1 + extraSize);
-			
-			Box logoutBox = new Box(-0.5, 0, -0.5, 0.5, 2, 0.5);
+			matrixStack.scale(1, 1, 1);
 			
 			// 채워진 박스 그리기 (투명도 0.1)
 			RenderSystem.setShaderColor(0, 1, 1, 0.1F);
 			RenderUtils.drawSolidBox(logoutBox, matrixStack); // drawFilledBox
-																// 또는 해당하는 메서드
-																// 사용
 			
 			// 윤곽선 박스 그리기 (투명도 0.75)
 			RenderSystem.setShaderColor(0, 1, 1, 0.1F);
 			RenderUtils.drawOutlinedBox(logoutBox, matrixStack);
-			
-			matrixStack.pop();
 		}
 		
 		matrixStack.pop();
