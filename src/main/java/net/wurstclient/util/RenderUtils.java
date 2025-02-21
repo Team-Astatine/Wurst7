@@ -7,11 +7,12 @@
  */
 package net.wurstclient.util;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Blocks;
@@ -21,6 +22,7 @@ import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.util.math.MatrixStack.Entry;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -83,6 +85,11 @@ public enum RenderUtils
 		return RegionPos.of(getCameraBlockPos());
 	}
 	
+	public static VertexConsumerProvider.Immediate getVCP()
+	{
+		return WurstClient.MC.getBufferBuilders().getEntityVertexConsumers();
+	}
+	
 	public static float[] getRainbowColor()
 	{
 		float x = System.currentTimeMillis() % 2000 / 1000F;
@@ -108,24 +115,64 @@ public enum RenderUtils
 			| (int)(MathHelper.clamp(rgb[2], 0, 1) * 255);
 	}
 	
+	public static void drawLine(MatrixStack matrices, Vec3d start, Vec3d end,
+		int color, boolean depthTest)
+	{
+		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthFunc(depthFunc);
+		
+		VertexConsumerProvider.Immediate vcp = getVCP();
+		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
+		VertexConsumer buffer = vcp.getBuffer(layer);
+		
+		Vec3d offset = getCameraPos().negate();
+		drawLine(matrices, buffer, start.add(offset), end.add(offset), color);
+		
+		vcp.draw(layer);
+	}
+	
 	public static void drawLine(MatrixStack matrices, VertexConsumer buffer,
 		Vec3d start, Vec3d end, int color)
 	{
-		drawLine(matrices, buffer, start.toVector3f(), end.toVector3f(), color);
+		Entry entry = matrices.peek();
+		float x1 = (float)start.x;
+		float y1 = (float)start.y;
+		float z1 = (float)start.z;
+		float x2 = (float)end.x;
+		float y2 = (float)end.y;
+		float z2 = (float)end.z;
+		drawLine(entry, buffer, x1, y1, z1, x2, y2, z2, color);
 	}
 	
-	public static void drawLine(MatrixStack matrices, VertexConsumer buffer,
-		Vector3f start, Vector3f end, int color)
+	public static void drawLine(MatrixStack.Entry entry, VertexConsumer buffer,
+		float x1, float y1, float z1, float x2, float y2, float z2, int color)
 	{
-		MatrixStack.Entry entry = matrices.peek();
-		Vector3f normal = new Vector3f(end).sub(start).normalize();
+		Vector3f normal = new Vector3f(x2, y2, z2).sub(x1, y1, z1).normalize();
+		buffer.vertex(entry, x1, y1, z1).color(color).normal(entry, normal);
+		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, normal);
+	}
+	
+	public static void drawCurvedLine(MatrixStack matrices, List<Vec3d> points,
+		int color, boolean depthTest)
+	{
+		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthFunc(depthFunc);
 		
-		buffer.vertex(entry, start).color(color).normal(entry, normal);
-		buffer.vertex(entry, end).color(color).normal(entry, normal);
+		VertexConsumerProvider.Immediate vcp = getVCP();
+		RenderLayer layer = WurstRenderLayers.getLineStrip(depthTest);
+		VertexConsumer buffer = vcp.getBuffer(layer);
+		
+		Vec3d offset = getCameraPos().negate();
+		List<Vec3d> points2 = points.stream().map(v -> v.add(offset)).toList();
+		drawCurvedLine(matrices, buffer, points2, color);
+		
+		vcp.draw(layer);
 	}
 	
 	public static void drawCurvedLine(MatrixStack matrices,
-		VertexConsumer buffer, ArrayList<Vec3d> points, int color)
+		VertexConsumer buffer, List<Vec3d> points, int color)
 	{
 		if(points.size() < 2)
 			return;
@@ -143,6 +190,23 @@ public enum RenderUtils
 			normal = new Vector3f(current).sub(prev).normalize();
 			buffer.vertex(entry, current).color(color).normal(entry, normal);
 		}
+	}
+	
+	public static void drawSolidBox(MatrixStack matrices, Box box, int color,
+		boolean depthTest)
+	{
+		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthFunc(depthFunc);
+		
+		VertexConsumerProvider.Immediate vcp = getVCP();
+		RenderLayer layer = WurstRenderLayers.getQuads(depthTest);
+		VertexConsumer buffer = vcp.getBuffer(layer);
+		
+		drawSolidBox(matrices, buffer, box.offset(getCameraPos().negate()),
+			color);
+		
+		vcp.draw(layer);
 	}
 	
 	public static void drawSolidBox(MatrixStack matrices, VertexConsumer buffer,
@@ -291,6 +355,23 @@ public enum RenderUtils
 		bufferBuilder.vertex(minX, minY, maxZ);
 		bufferBuilder.vertex(minX, maxY, maxZ);
 		bufferBuilder.vertex(minX, maxY, minZ);
+	}
+	
+	public static void drawOutlinedBox(MatrixStack matrices, Box box, int color,
+		boolean depthTest)
+	{
+		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthFunc(depthFunc);
+		
+		VertexConsumerProvider.Immediate vcp = getVCP();
+		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
+		VertexConsumer buffer = vcp.getBuffer(layer);
+		
+		drawOutlinedBox(matrices, buffer, box.offset(getCameraPos().negate()),
+			color);
+		
+		vcp.draw(layer);
 	}
 	
 	public static void drawOutlinedBox(MatrixStack matrices,
@@ -453,6 +534,23 @@ public enum RenderUtils
 		bufferBuilder.vertex(minX, maxY, minZ);
 	}
 	
+	public static void drawCrossBox(MatrixStack matrices, Box box, int color,
+		boolean depthTest)
+	{
+		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthFunc(depthFunc);
+		
+		VertexConsumerProvider.Immediate vcp = getVCP();
+		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
+		VertexConsumer buffer = vcp.getBuffer(layer);
+		
+		drawCrossBox(matrices, buffer, box.offset(getCameraPos().negate()),
+			color);
+		
+		vcp.draw(layer);
+	}
+	
 	public static void drawCrossBox(MatrixStack matrices, VertexConsumer buffer,
 		Box box, int color)
 	{
@@ -613,6 +711,55 @@ public enum RenderUtils
 		bufferBuilder.vertex(minX, minY, minZ);
 	}
 	
+	public static void drawNode(MatrixStack matrices, Box box, int color,
+		boolean depthTest)
+	{
+		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthFunc(depthFunc);
+		
+		VertexConsumerProvider.Immediate vcp = getVCP();
+		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
+		VertexConsumer buffer = vcp.getBuffer(layer);
+		
+		drawNode(matrices, buffer, box.offset(getCameraPos().negate()), color);
+		
+		vcp.draw(layer);
+	}
+	
+	public static void drawNode(MatrixStack matrices, VertexConsumer buffer,
+		Box box, int color)
+	{
+		MatrixStack.Entry entry = matrices.peek();
+		float x1 = (float)box.minX;
+		float y1 = (float)box.minY;
+		float z1 = (float)box.minZ;
+		float x2 = (float)box.maxX;
+		float y2 = (float)box.maxY;
+		float z2 = (float)box.maxZ;
+		float x3 = (x1 + x2) / 2F;
+		float y3 = (y1 + y2) / 2F;
+		float z3 = (z1 + z2) / 2F;
+		
+		// middle part
+		drawLine(entry, buffer, x3, y3, z2, x1, y3, z3, color);
+		drawLine(entry, buffer, x1, y3, z3, x3, y3, z1, color);
+		drawLine(entry, buffer, x3, y3, z1, x2, y3, z3, color);
+		drawLine(entry, buffer, x2, y3, z3, x3, y3, z2, color);
+		
+		// top part
+		drawLine(entry, buffer, x3, y2, z3, x2, y3, z3, color);
+		drawLine(entry, buffer, x3, y2, z3, x1, y3, z3, color);
+		drawLine(entry, buffer, x3, y2, z3, x3, y3, z1, color);
+		drawLine(entry, buffer, x3, y2, z3, x3, y3, z2, color);
+		
+		// bottom part
+		drawLine(entry, buffer, x3, y1, z3, x2, y3, z3, color);
+		drawLine(entry, buffer, x3, y1, z3, x1, y3, z3, color);
+		drawLine(entry, buffer, x3, y1, z3, x3, y3, z1, color);
+		drawLine(entry, buffer, x3, y1, z3, x3, y3, z2, color);
+	}
+	
 	public static void drawNode(Box bb, MatrixStack matrixStack)
 	{
 		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
@@ -728,6 +875,14 @@ public enum RenderUtils
 	}
 	
 	public static void drawArrow(MatrixStack matrices, VertexConsumer buffer,
+		BlockPos from, BlockPos to, RegionPos region, int color)
+	{
+		Vec3d fromVec = from.toCenterPos().subtract(region.x(), 0, region.z());
+		Vec3d toVec = to.toCenterPos().subtract(region.x(), 0, region.z());
+		drawArrow(matrices, buffer, fromVec, toVec, color, 1 / 16F);
+	}
+	
+	public static void drawArrow(MatrixStack matrices, VertexConsumer buffer,
 		Vec3d from, Vec3d to, int color, float headSize)
 	{
 		matrices.push();
@@ -735,11 +890,7 @@ public enum RenderUtils
 		Matrix4f matrix = entry.getPositionMatrix();
 		
 		// main line
-		Vector3f fromJoml = from.toVector3f();
-		Vector3f toJoml = to.toVector3f();
-		Vector3f normal = to.subtract(from).normalize().toVector3f();
-		buffer.vertex(entry, fromJoml).color(color).normal(entry, normal);
-		buffer.vertex(entry, toJoml).color(color).normal(entry, normal);
+		drawLine(matrices, buffer, from, to, color);
 		
 		matrices.translate(to);
 		matrices.scale(headSize, headSize, headSize);
@@ -756,35 +907,16 @@ public enum RenderUtils
 		matrix.rotate(zAngle, new Vector3f(0, 0, 1));
 		
 		// arrow head
-		buffer.vertex(matrix, 0, 2, 1).color(color).normal(-1, 0, -1);
-		buffer.vertex(matrix, -1, 2, 0).color(color).normal(-1, 0, -1);
-		
-		buffer.vertex(matrix, -1, 2, 0).color(color).normal(1, 0, -1);
-		buffer.vertex(matrix, 0, 2, -1).color(color).normal(1, 0, -1);
-		
-		buffer.vertex(matrix, 0, 2, -1).color(color).normal(1, 0, 1);
-		buffer.vertex(matrix, 1, 2, 0).color(color).normal(1, 0, 1);
-		
-		buffer.vertex(matrix, 1, 2, 0).color(color).normal(-1, 0, 1);
-		buffer.vertex(matrix, 0, 2, 1).color(color).normal(-1, 0, 1);
-		
-		buffer.vertex(matrix, 1, 2, 0).color(color).normal(-1, 0, 0);
-		buffer.vertex(matrix, -1, 2, 0).color(color).normal(-1, 0, 0);
-		
-		buffer.vertex(matrix, 0, 2, 1).color(color).normal(0, 0, -1);
-		buffer.vertex(matrix, 0, 2, -1).color(color).normal(0, 0, 1);
-		
-		buffer.vertex(matrix, 0, 0, 0).color(color).normal(1, 2, 0);
-		buffer.vertex(matrix, 1, 2, 0).color(color).normal(1, 2, 0);
-		
-		buffer.vertex(matrix, 0, 0, 0).color(color).normal(-1, 2, 0);
-		buffer.vertex(matrix, -1, 2, 0).color(color).normal(-1, 2, 0);
-		
-		buffer.vertex(matrix, 0, 0, 0).color(color).normal(0, 2, -1);
-		buffer.vertex(matrix, 0, 2, -1).color(color).normal(0, 2, -1);
-		
-		buffer.vertex(matrix, 0, 0, 0).color(color).normal(0, 2, 1);
-		buffer.vertex(matrix, 0, 2, 1).color(color).normal(0, 2, 1);
+		drawLine(entry, buffer, 0, 2, 1, -1, 2, 0, color);
+		drawLine(entry, buffer, -1, 2, 0, 0, 2, -1, color);
+		drawLine(entry, buffer, 0, 2, -1, 1, 2, 0, color);
+		drawLine(entry, buffer, 1, 2, 0, 0, 2, 1, color);
+		drawLine(entry, buffer, 1, 2, 0, -1, 2, 0, color);
+		drawLine(entry, buffer, 0, 2, 1, 0, 2, -1, color);
+		drawLine(entry, buffer, 0, 0, 0, 1, 2, 0, color);
+		drawLine(entry, buffer, 0, 0, 0, -1, 2, 0, color);
+		drawLine(entry, buffer, 0, 0, 0, 0, 2, -1, color);
+		drawLine(entry, buffer, 0, 0, 0, 0, 2, 1, color);
 		
 		matrices.pop();
 	}
