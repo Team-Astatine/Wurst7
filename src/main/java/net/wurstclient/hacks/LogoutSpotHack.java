@@ -7,14 +7,18 @@
  */
 package net.wurstclient.hacks;
 
+import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -122,11 +126,19 @@ public final class LogoutSpotHack extends Hack
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
+		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
+		
+		VertexConsumerProvider.Immediate vcp =
+			MC.getBufferBuilders().getEntityVertexConsumers();
+		VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
+		
 		matrixStack.push();
 		
 		RegionPos region = RenderUtils.getCameraRegion();
 		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
+		
 		Box logoutBox = new Box(-0.5, 0, -0.5, 0.5, 2, 0.5);
+		RenderSystem.setShaderColor(0, 1, 1, 0.1F);
 		
 		for(Entry entry : logOutPlayers.values())
 		{
@@ -134,12 +146,7 @@ public final class LogoutSpotHack extends Hack
 			matrixStack.translate(outPosition.x, outPosition.y, outPosition.z);
 			matrixStack.scale(1, 1, 1);
 			
-			// 채워진 박스 그리기 (투명도 0.1)
-			RenderSystem.setShaderColor(0, 1, 1, 0.1F);
-			RenderUtils.drawSolidBox(logoutBox, matrixStack); // drawFilledBox
-			
-			// 윤곽선 박스 그리기 (투명도 0.75)
-			RenderSystem.setShaderColor(0, 1, 1, 0.1F);
+			RenderUtils.drawSolidBox(logoutBox, matrixStack);
 			RenderUtils.drawOutlinedBox(logoutBox, matrixStack);
 		}
 		
