@@ -2,9 +2,10 @@
   "schemaVersion": 1,
   "id": "wurst",
   "version": "${version}",
-  "name": "Wurst Client",
-  "description": "Wurst Wurst Wurst!",
+  "name": "Wurst Client for Astatine",
+  "description": "Wurst Wurst Wurst ASTN ASTN ASTN!",
   "authors": [
+    "JAXPLE",
     "Alexander01998"
   ],
   "contact": {
