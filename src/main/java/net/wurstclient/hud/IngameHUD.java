@@ -15,7 +15,7 @@ import net.wurstclient.events.GUIRenderListener;
 
 public final class IngameHUD implements GUIRenderListener
 {
-	private final WurstLogo wurstLogo = new WurstLogo();
+	private final AstatineLogo astatineLogo = new AstatineLogo();
 	private final HackListHUD hackList = new HackListHUD();
 	private TabGui tabGui;
 	
@@ -32,7 +32,7 @@ public final class IngameHUD implements GUIRenderListener
 		
 		clickGui.updateColors();
 		
-		wurstLogo.render(context);
+		astatineLogo.render(context);
 		hackList.render(context, partialTicks);
 		tabGui.render(context, partialTicks);
 		

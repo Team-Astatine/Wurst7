@@ -15,7 +15,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.other_features.WurstLogoOtf;
 import net.wurstclient.util.RenderUtils;
 
-public final class WurstLogo
+public final class AstatineLogo
 {
 	private static final WurstClient WURST = WurstClient.INSTANCE;
 	private static final Identifier LOGO_TEXTURE =
@@ -52,7 +52,7 @@ public final class WurstLogo
 		version += " MC" + WurstClient.MC_VERSION;
 		
 		if(WURST.getUpdater().isOutdated())
-			version += " (outdated)";
+			version += " (Check UP Astatine Github)";
 		
 		return version;
 	}
