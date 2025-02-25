@@ -26,6 +26,21 @@ public final class AttackSpeedSliderSetting extends SliderSetting
 			ValueDisplay.DECIMAL.withLabel(0, "auto"));
 	}
 	
+	public AttackSpeedSliderSetting(String name, double attackSpeed,
+		String description)
+	{
+		super(name, description, attackSpeed, 0, 20, 0.1,
+			ValueDisplay.DECIMAL.withLabel(0, "auto"));
+	}
+	
+	public void setAttackSpeed(double newSpeed)
+	{
+		// 기존의 setValue 메서드를 이용하여 값을 업데이트합니다.
+		setValue(newSpeed);
+		// 값 변경에 따른 타이머 재설정
+		resetTimer();
+	}
+	
 	@Override
 	public float[] getKnobColor()
 	{

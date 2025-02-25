@@ -14,6 +14,8 @@ import java.util.stream.Stream;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -95,6 +97,14 @@ public final class ClickAuraHack extends Hack
 	{
 		if(!MC.options.attackKey.isPressed())
 			return;
+		
+		int setAttackSpeed = 0;
+		ItemStack mainHandItem = MC.player.getInventory().getMainHandStack();
+		if(mainHandItem.getItem() == Items.MACE)
+			setAttackSpeed = 20;
+		else
+			setAttackSpeed = 0;
+		speed.setAttackSpeed(setAttackSpeed);
 		
 		speed.updateTimer();
 		if(!speed.isTimeToAttack())

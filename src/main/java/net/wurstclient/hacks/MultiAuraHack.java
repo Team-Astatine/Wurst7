@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -33,8 +35,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	private final SliderSetting range =
 		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
-	private final AttackSpeedSliderSetting speed =
-		new AttackSpeedSliderSetting();
+	private AttackSpeedSliderSetting speed = new AttackSpeedSliderSetting();
 	
 	private final SliderSetting fov =
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
@@ -89,6 +90,14 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
+		int setAttackSpeed = 0;
+		ItemStack mainHandItem = MC.player.getInventory().getMainHandStack();
+		if(mainHandItem.getItem() == Items.MACE)
+			setAttackSpeed = 20;
+		else
+			setAttackSpeed = 0;
+		speed.setAttackSpeed(setAttackSpeed);
+		
 		speed.updateTimer();
 		if(!speed.isTimeToAttack())
 			return;
@@ -125,7 +134,9 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 			MC.interactionManager.attackEntity(MC.player, entity);
 		}
 		
-		swingHand.swing(Hand.MAIN_HAND);
+		if(swingHand.getSelected() != SwingHand.OFF)
+			swingHand.swing(Hand.MAIN_HAND);
+		
 		speed.resetTimer();
 	}
 }
