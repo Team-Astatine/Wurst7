@@ -9,6 +9,7 @@ package net.wurstclient.util;
 
 import java.util.List;
 
+import net.minecraft.client.gl.ShaderProgramKeys;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -374,6 +375,54 @@ public enum RenderUtils
 		buffer.vertex(entry, x1, y2, z1).color(color);
 	}
 	
+	public static void drawSolidBox(Box bb, MatrixStack matrixStack)
+	{
+		float minX = (float)bb.minX;
+		float minY = (float)bb.minY;
+		float minZ = (float)bb.minZ;
+		float maxX = (float)bb.maxX;
+		float maxY = (float)bb.maxY;
+		float maxZ = (float)bb.maxZ;
+		
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+		
+		bufferBuilder.vertex(matrix, minX, minY, minZ);
+		bufferBuilder.vertex(matrix, maxX, minY, minZ);
+		bufferBuilder.vertex(matrix, maxX, minY, maxZ);
+		bufferBuilder.vertex(matrix, minX, minY, maxZ);
+		
+		bufferBuilder.vertex(matrix, minX, maxY, minZ);
+		bufferBuilder.vertex(matrix, minX, maxY, maxZ);
+		bufferBuilder.vertex(matrix, maxX, maxY, maxZ);
+		bufferBuilder.vertex(matrix, maxX, maxY, minZ);
+		
+		bufferBuilder.vertex(matrix, minX, minY, minZ);
+		bufferBuilder.vertex(matrix, minX, maxY, minZ);
+		bufferBuilder.vertex(matrix, maxX, maxY, minZ);
+		bufferBuilder.vertex(matrix, maxX, minY, minZ);
+		
+		bufferBuilder.vertex(matrix, maxX, minY, minZ);
+		bufferBuilder.vertex(matrix, maxX, maxY, minZ);
+		bufferBuilder.vertex(matrix, maxX, maxY, maxZ);
+		bufferBuilder.vertex(matrix, maxX, minY, maxZ);
+		
+		bufferBuilder.vertex(matrix, minX, minY, maxZ);
+		bufferBuilder.vertex(matrix, maxX, minY, maxZ);
+		bufferBuilder.vertex(matrix, maxX, maxY, maxZ);
+		bufferBuilder.vertex(matrix, minX, maxY, maxZ);
+		
+		bufferBuilder.vertex(matrix, minX, minY, minZ);
+		bufferBuilder.vertex(matrix, minX, minY, maxZ);
+		bufferBuilder.vertex(matrix, minX, maxY, maxZ);
+		bufferBuilder.vertex(matrix, minX, maxY, minZ);
+		
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+	}
+	
 	public static void drawOutlinedBox(MatrixStack matrices, Box box, int color,
 		boolean depthTest)
 	{
@@ -474,6 +523,60 @@ public enum RenderUtils
 		buffer.vertex(entry, x1, y2, z2).color(color).normal(entry, 0, 1, 0);
 		buffer.vertex(entry, x2, y1, z2).color(color).normal(entry, 0, 1, 0);
 		buffer.vertex(entry, x2, y2, z2).color(color).normal(entry, 0, 1, 0);
+	}
+	
+	public static void drawOutlinedBox(Box bb, MatrixStack matrixStack)
+	{
+		Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+		Tessellator tessellator = RenderSystem.renderThreadTesselator();
+		RenderSystem.setShader(ShaderProgramKeys.POSITION);
+		BufferBuilder bufferBuilder = tessellator
+			.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION);
+		
+		float minX = (float)bb.minX;
+		float minY = (float)bb.minY;
+		float minZ = (float)bb.minZ;
+		float maxX = (float)bb.maxX;
+		float maxY = (float)bb.maxY;
+		float maxZ = (float)bb.maxZ;
+		
+		bufferBuilder.vertex(matrix, minX, minY, minZ);
+		bufferBuilder.vertex(matrix, maxX, minY, minZ);
+		
+		bufferBuilder.vertex(matrix, maxX, minY, minZ);
+		bufferBuilder.vertex(matrix, maxX, minY, maxZ);
+		
+		bufferBuilder.vertex(matrix, maxX, minY, maxZ);
+		bufferBuilder.vertex(matrix, minX, minY, maxZ);
+		
+		bufferBuilder.vertex(matrix, minX, minY, maxZ);
+		bufferBuilder.vertex(matrix, minX, minY, minZ);
+		
+		bufferBuilder.vertex(matrix, minX, minY, minZ);
+		bufferBuilder.vertex(matrix, minX, maxY, minZ);
+		
+		bufferBuilder.vertex(matrix, maxX, minY, minZ);
+		bufferBuilder.vertex(matrix, maxX, maxY, minZ);
+		
+		bufferBuilder.vertex(matrix, maxX, minY, maxZ);
+		bufferBuilder.vertex(matrix, maxX, maxY, maxZ);
+		
+		bufferBuilder.vertex(matrix, minX, minY, maxZ);
+		bufferBuilder.vertex(matrix, minX, maxY, maxZ);
+		
+		bufferBuilder.vertex(matrix, minX, maxY, minZ);
+		bufferBuilder.vertex(matrix, maxX, maxY, minZ);
+		
+		bufferBuilder.vertex(matrix, maxX, maxY, minZ);
+		bufferBuilder.vertex(matrix, maxX, maxY, maxZ);
+		
+		bufferBuilder.vertex(matrix, maxX, maxY, maxZ);
+		bufferBuilder.vertex(matrix, minX, maxY, maxZ);
+		
+		bufferBuilder.vertex(matrix, minX, maxY, maxZ);
+		bufferBuilder.vertex(matrix, minX, maxY, minZ);
+		
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	public static void drawOutlinedBox(Box bb, VertexBuffer vertexBuffer)
