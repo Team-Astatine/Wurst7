@@ -59,9 +59,9 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 			return getName();
 		
 		if(totems == 1)
-			return getName() + " [1 totem]";
+			return getName() + " >> 1 토템 <<";
 		
-		return getName() + " [" + totems + " totems]";
+		return getName() + " >> " + totems + " 토템 <<";
 	}
 	
 	@Override
@@ -92,8 +92,7 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 			wasTotemInOffhand = true;
 			return;
 		}
-		
-		if(wasTotemInOffhand)
+
 		{
 			timer = delay.getValueI();
 			wasTotemInOffhand = false;
