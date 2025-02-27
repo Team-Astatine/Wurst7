@@ -92,7 +92,7 @@ public final class AutoTotemHack extends Hack implements UpdateListener
 			wasTotemInOffhand = true;
 			return;
 		}
-
+		
 		{
 			timer = delay.getValueI();
 			wasTotemInOffhand = false;
