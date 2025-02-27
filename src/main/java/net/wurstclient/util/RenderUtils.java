@@ -761,6 +761,11 @@ public enum RenderUtils
 		vcp.draw(layer);
 	}
 	
+	public static void drawNode(VertexConsumer buffer, Box box, int color)
+	{
+		drawNode(new MatrixStack(), buffer, box, color);
+	}
+	
 	public static void drawNode(MatrixStack matrices, VertexConsumer buffer,
 		Box box, int color)
 	{
@@ -862,6 +867,12 @@ public enum RenderUtils
 		Vec3d fromVec = from.toCenterPos().subtract(region.x(), 0, region.z());
 		Vec3d toVec = to.toCenterPos().subtract(region.x(), 0, region.z());
 		drawArrow(matrices, buffer, fromVec, toVec, color, 1 / 16F);
+	}
+	
+	public static void drawArrow(VertexConsumer buffer, Vec3d from, Vec3d to,
+		int color, float headSize)
+	{
+		drawArrow(new MatrixStack(), buffer, from, to, color, headSize);
 	}
 	
 	public static void drawArrow(MatrixStack matrices, VertexConsumer buffer,
