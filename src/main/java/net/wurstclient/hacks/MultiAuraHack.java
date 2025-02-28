@@ -93,7 +93,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		int setAttackSpeed = 0;
 		ItemStack mainHandItem = MC.player.getInventory().getMainHandStack();
 		if(mainHandItem.getItem() == Items.MACE)
-			setAttackSpeed = 20;
+			setAttackSpeed = 30;
 		else
 			setAttackSpeed = 0;
 		speed.setAttackSpeed(setAttackSpeed);
