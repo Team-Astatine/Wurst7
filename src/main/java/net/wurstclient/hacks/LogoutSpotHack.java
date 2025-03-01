@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 public final class LogoutSpotHack extends Hack
 	implements UpdateListener, RenderListener
 {
-	record Entry(UUID uuid, Vec3d position, Instant instant)
+	private record Entry(UUID uuid, Vec3d position, Instant instant)
 	{}
 	
 	private Map<UUID, String> onlinePlayers = new HashMap<>();
