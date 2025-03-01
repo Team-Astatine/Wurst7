@@ -11,9 +11,11 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+// 추가
+// 추가
 import net.minecraft.util.Hand;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -66,7 +68,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	@Override
 	protected void onEnable()
 	{
-		// disable other killauras
+		// 기존 코드 유지
 		WURST.getHax().aimAssistHack.setEnabled(false);
 		WURST.getHax().clickAuraHack.setEnabled(false);
 		WURST.getHax().crystalAuraHack.setEnabled(false);
@@ -90,12 +92,11 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		int setAttackSpeed = 0;
-		ItemStack mainHandItem = MC.player.getInventory().getMainHandStack();
-		if(mainHandItem.getItem() == Items.MACE)
-			setAttackSpeed = 30;
-		else
-			setAttackSpeed = 0;
+		ClientPlayerEntity player = MC.player;
+		boolean isMainHandHoldingMace =
+			player.getInventory().getMainHandStack().isOf(Items.MACE);
+		
+		int setAttackSpeed = isMainHandHoldingMace ? 30 : 0;
 		speed.setAttackSpeed(setAttackSpeed);
 		
 		speed.updateTimer();
@@ -105,7 +106,6 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		if(pauseOnContainers.shouldPause())
 			return;
 		
-		// get entities
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
 		double rangeSq = Math.pow(range.getValue(), 2);
 		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
@@ -123,16 +123,44 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		
 		WURST.getHax().autoSwordHack.setSlot(entities.get(0));
 		
-		// attack entities
+		// RegistryEntry<Enchantment> windBurstEntry = null;
+		// boolean isWindBurstMace = false;
+		//
+		// if(isMainHandHoldingMace)
+		// {
+		//
+		// // ***** 수정: RegistryEntry<Enchantment>로 변환 *****
+		// windBurstEntry = MinecraftClient.getInstance().world
+		// .getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT)
+		// .getEntry(Enchantments.WIND_BURST.getValue()) // 올바른 RegistryKey
+		// // 추출
+		// .orElse(null);
+		//
+		// isWindBurstMace = isMainHandHoldingMace && windBurstEntry != null
+		// && EnchantmentHelper.getLevel(windBurstEntry,
+		// player.getMainHandStack()) > 0;
+		// }
+		
+		// 공격 로직
 		for(Entity entity : entities)
 		{
 			if(swingHand.getSelected() != SwingHand.OFF)
+			{
 				RotationUtils
 					.getNeededRotations(entity.getBoundingBox().getCenter())
 					.sendPlayerLookPacket();
+			}
 			
 			MC.interactionManager.attackEntity(MC.player, entity);
 		}
+		
+		// if(!entities.isEmpty() && isWindBurstMace)
+		// {
+		// MC.player.networkHandler.sendPacket(
+		// new PlayerMoveC2SPacket.PositionAndOnGround(MC.player.getX(),
+		// MC.player.getY(), MC.player.getZ(), true,
+		// MC.player.horizontalCollision));
+		// }
 		
 		if(swingHand.getSelected() != SwingHand.OFF)
 			swingHand.swing(Hand.MAIN_HAND);
