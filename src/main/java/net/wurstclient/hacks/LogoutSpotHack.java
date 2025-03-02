@@ -7,18 +7,14 @@
  */
 package net.wurstclient.hacks;
 
-import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -126,11 +122,11 @@ public final class LogoutSpotHack extends Hack
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		
-		RenderSystem.depthFunc(GlConst.GL_ALWAYS);
-		
-		VertexConsumerProvider.Immediate vcp =
-			MC.getBufferBuilders().getEntityVertexConsumers();
-		VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
+		// RenderSystem.depthFunc(GlConst.GL_ALWAYS);
+		//
+		// VertexConsumerProvider.Immediate vcp =
+		// MC.getBufferBuilders().getEntityVertexConsumers();
+		// VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
 		
 		matrixStack.push();
 		
