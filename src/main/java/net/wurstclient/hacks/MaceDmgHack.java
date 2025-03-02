@@ -48,10 +48,13 @@ public final class MaceDmgHack extends Hack
 		if(!MC.player.getMainHandStack().isOf(Items.MACE))
 			return;
 		
-		for(int i = 0; i < 4; i++)
-			sendFakeY(0);
-		sendFakeY(Math.sqrt(300));
-		sendFakeY(0);
+		for(int i = 0; i < 7; i++)
+		{
+			int packetOffset = 0;
+			if(i == 4)
+				packetOffset = 300;
+			sendFakeY(packetOffset);
+		}
 	}
 	
 	private int getMaximumHeight(ClientPlayerEntity player)
