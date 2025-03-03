@@ -130,6 +130,9 @@ public final class TpAuraHack extends Hack implements UpdateListener
 		if(player.getAttackCooldownProgress(0) < 1)
 			return;
 		
+		if(entity.getUuid().equals(AUTHOR_PLAYER))
+			return;
+		
 		// attack entity
 		RotationUtils.getNeededRotations(entity.getBoundingBox().getCenter())
 			.sendPlayerLookPacket();

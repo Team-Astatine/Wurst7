@@ -166,6 +166,9 @@ public final class KillauraHack extends Hack
 		if(target == null)
 			return;
 		
+		if(target.getUuid().equals(AUTHOR_PLAYER))
+			return;
+		
 		WURST.getHax().autoSwordHack.setSlot(target);
 		
 		Vec3d hitVec = target.getBoundingBox().getCenter();

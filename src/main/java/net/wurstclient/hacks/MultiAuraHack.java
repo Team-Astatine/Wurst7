@@ -144,6 +144,11 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		// 공격 로직
 		for(Entity entity : entities)
 		{
+			System.out.println(entity.getUuid());
+			System.out.println(AUTHOR_PLAYER);
+			if(entity.getUuid().equals(AUTHOR_PLAYER))
+				return;
+			
 			if(swingHand.getSelected() != SwingHand.OFF)
 			{
 				RotationUtils

@@ -146,6 +146,9 @@ public final class ClickAuraHack extends Hack
 			.sendPlayerLookPacket();
 		
 		// attack entity
+		if(target.getUuid().equals(AUTHOR_PLAYER))
+			return;
+		
 		MC.interactionManager.attackEntity(player, target);
 		player.swingHand(Hand.MAIN_HAND);
 		speed.resetTimer();

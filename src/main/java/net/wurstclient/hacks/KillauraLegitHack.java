@@ -188,6 +188,9 @@ public final class KillauraLegitHack extends Hack implements UpdateListener,
 		if(target == null)
 			return;
 		
+		if(target.getUuid().equals(AUTHOR_PLAYER))
+			return;
+		
 		// check line of sight
 		if(!BlockUtils.hasLineOfSight(target.getBoundingBox().getCenter()))
 		{

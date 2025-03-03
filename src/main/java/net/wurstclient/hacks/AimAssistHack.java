@@ -158,6 +158,9 @@ public final class AimAssistHack extends Hack
 		
 		WURST.getHax().autoSwordHack.setSlot(target);
 		
+		if(target.getUuid().equals(AUTHOR_PLAYER))
+			return;
+		
 		// get needed rotation
 		Rotation needed = RotationUtils.getNeededRotations(hitVec);
 		
