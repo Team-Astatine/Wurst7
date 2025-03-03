@@ -142,8 +142,8 @@ public final class LogoutSpotHack extends Hack
 			matrixStack.translate(outPosition.x, outPosition.y, outPosition.z);
 			matrixStack.scale(1, 1, 1);
 			
-			RenderUtils.drawSolidBox(logoutBox, matrixStack);
-			RenderUtils.drawOutlinedBox(logoutBox, matrixStack);
+			// RenderUtils.drawSolidBox(logoutBox, matrixStack);
+			// RenderUtils.drawOutlinedBox(logoutBox, matrixStack);
 		}
 		
 		matrixStack.pop();
