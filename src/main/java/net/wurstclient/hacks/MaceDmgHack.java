@@ -26,9 +26,9 @@ public final class MaceDmgHack extends Hack
 	implements PlayerAttacksEntityListener
 {
 	private final SliderSetting sqrtValue = new SliderSetting("Mace Sqrt Value",
-			"description.wurst.setting.maceDmg.SqrtValue", 300, 1, 300, 1,
-			SliderSetting.ValueDisplay.DECIMAL);
-
+		"description.wurst.setting.maceDmg.SqrtValue", 300, 1, 300, 1,
+		SliderSetting.ValueDisplay.DECIMAL);
+	
 	public MaceDmgHack()
 	{
 		super("MaceDMG");
