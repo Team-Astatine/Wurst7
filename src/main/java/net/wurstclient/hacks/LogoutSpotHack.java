@@ -7,25 +7,33 @@
  */
 package net.wurstclient.hacks;
 
+import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.ColorSetting;
+import net.wurstclient.util.EasyVertexBuffer;
 import net.wurstclient.util.FakePlayerEntity;
 import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -33,6 +41,9 @@ import java.util.stream.Collectors;
 public final class LogoutSpotHack extends Hack
 	implements UpdateListener, RenderListener
 {
+	private final ColorSetting color =
+			new ColorSetting("Tracer color", Color.WHITE);
+
 	private record Entry(UUID uuid, Vec3d position, Instant instant)
 	{}
 	
@@ -45,7 +56,9 @@ public final class LogoutSpotHack extends Hack
 	{
 		super("LogOutSpot");
 		setCategory(Category.RENDER);
-		
+
+		addSetting(color);
+
 		scheduler.scheduleWithFixedDelay(
 			() -> logOutPlayers.entrySet()
 				.removeIf(entry -> Instant.now().isAfter(
@@ -114,42 +127,25 @@ public final class LogoutSpotHack extends Hack
 		lastPlayers.clear();
 		lastPlayers = onlinePlayers;
 	}
-	
+
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks)
-	{
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		
-		// RenderSystem.depthFunc(GlConst.GL_ALWAYS);
-		//
-		// VertexConsumerProvider.Immediate vcp =
-		// MC.getBufferBuilders().getEntityVertexConsumers();
-		// VertexConsumer buffer = vcp.getBuffer(WurstRenderLayers.ESP_LINES);
-		
-		matrixStack.push();
-		
-		RegionPos region = RenderUtils.getCameraRegion();
-		RenderUtils.applyRegionalRenderOffset(matrixStack, region);
-		
-		Box logoutBox = new Box(-0.5, 0, -0.5, 0.5, 2, 0.5);
-		RenderSystem.setShaderColor(0, 1, 1, 0.1F);
-		
-		for(Entry entry : logOutPlayers.values())
-		{
-			Vec3d outPosition = entry.position().subtract(region.toVec3d());
-			matrixStack.translate(outPosition.x, outPosition.y, outPosition.z);
-			matrixStack.scale(1, 1, 1);
-			
-			// RenderUtils.drawSolidBox(logoutBox, matrixStack);
-			// RenderUtils.drawOutlinedBox(logoutBox, matrixStack);
+	public void onRender(MatrixStack matrixStack, float partialTicks) {
+		List<Box> boxes = new ArrayList<>();
+
+		for (Entry entry : logOutPlayers.values()) {
+			Vec3d outPosition = entry.position();
+			boxes.add(
+					new Box(
+					outPosition.x - 0.5,
+					outPosition.y,
+					outPosition.z - 0.5,
+					outPosition.x + 0.5,
+					outPosition.y + 2,
+					outPosition.z + 0.5
+				)
+			);
 		}
-		
-		matrixStack.pop();
-		
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_BLEND);
+
+		RenderUtils.drawSolidBoxes(matrixStack, boxes, color.getColorI(0x80), false);
 	}
 }
