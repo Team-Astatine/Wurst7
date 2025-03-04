@@ -7,27 +7,19 @@
  */
 package net.wurstclient.hacks;
 
-import com.mojang.blaze3d.platform.GlConst;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.WurstRenderLayers;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.ColorSetting;
-import net.wurstclient.util.EasyVertexBuffer;
 import net.wurstclient.util.FakePlayerEntity;
-import net.wurstclient.util.RegionPos;
 import net.wurstclient.util.RenderUtils;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.time.Instant;
@@ -42,8 +34,8 @@ public final class LogoutSpotHack extends Hack
 	implements UpdateListener, RenderListener
 {
 	private final ColorSetting color =
-			new ColorSetting("Tracer color", Color.WHITE);
-
+		new ColorSetting("Box Color", Color.WHITE);
+	
 	private record Entry(UUID uuid, Vec3d position, Instant instant)
 	{}
 	
@@ -56,9 +48,9 @@ public final class LogoutSpotHack extends Hack
 	{
 		super("LogOutSpot");
 		setCategory(Category.RENDER);
-
+		
 		addSetting(color);
-
+		
 		scheduler.scheduleWithFixedDelay(
 			() -> logOutPlayers.entrySet()
 				.removeIf(entry -> Instant.now().isAfter(
@@ -127,25 +119,24 @@ public final class LogoutSpotHack extends Hack
 		lastPlayers.clear();
 		lastPlayers = onlinePlayers;
 	}
-
+	
 	@Override
-	public void onRender(MatrixStack matrixStack, float partialTicks) {
-		List<Box> boxes = new ArrayList<>();
-
-		for (Entry entry : logOutPlayers.values()) {
-			Vec3d outPosition = entry.position();
-			boxes.add(
-					new Box(
-					outPosition.x - 0.5,
-					outPosition.y,
-					outPosition.z - 0.5,
-					outPosition.x + 0.5,
-					outPosition.y + 2,
-					outPosition.z + 0.5
-				)
-			);
+	public void onRender(MatrixStack matrixStack, float partialTicks)
+	{
+		if(logOutPlayers.isEmpty())
+			return;
+		
+		List<Box> logoutPlayerPositionBox = new ArrayList<>();
+		for(Entry entry : logOutPlayers.values())
+		{
+			Vec3d targetExitPosition = entry.position();
+			logoutPlayerPositionBox
+				.add(new Box(targetExitPosition.x - 0.5, targetExitPosition.y,
+					targetExitPosition.z - 0.5, targetExitPosition.x + 0.5,
+					targetExitPosition.y + 2, targetExitPosition.z + 0.5));
 		}
-
-		RenderUtils.drawSolidBoxes(matrixStack, boxes, color.getColorI(0x80), false);
+		
+		RenderUtils.drawSolidBoxes(matrixStack, logoutPlayerPositionBox,
+			color.getColorI(0x80), false);
 	}
 }
