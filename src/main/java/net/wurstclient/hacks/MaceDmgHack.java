@@ -19,15 +19,21 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PlayerAttacksEntityListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.SliderSetting;
 
 @SearchTags({"mace dmg", "MaceDamage", "mace damage"})
 public final class MaceDmgHack extends Hack
 	implements PlayerAttacksEntityListener
 {
+	private final SliderSetting sqrtValue = new SliderSetting("Mace Sqrt Value",
+			"description.wurst.setting.maceDmg.SqrtValue", 300, 1, 300, 1,
+			SliderSetting.ValueDisplay.DECIMAL);
+
 	public MaceDmgHack()
 	{
 		super("MaceDMG");
 		setCategory(Category.COMBAT);
+		addSetting(sqrtValue);
 	}
 	
 	@Override
@@ -50,7 +56,7 @@ public final class MaceDmgHack extends Hack
 		
 		for(int i = 0; i < 4; i++)
 			sendFakeY(0);
-		sendFakeY(Math.sqrt(300));
+		sendFakeY(Math.sqrt(sqrtValue.getValue()));
 		sendFakeY(0);
 	}
 	
