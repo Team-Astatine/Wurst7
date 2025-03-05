@@ -96,7 +96,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		boolean isMainHandHoldingMace =
 			player.getInventory().getMainHandStack().isOf(Items.MACE);
 		
-		int setAttackSpeed = isMainHandHoldingMace ? 30 : 0;
+		int setAttackSpeed = isMainHandHoldingMace ? 40 : 0;
 		speed.setAttackSpeed(setAttackSpeed);
 		
 		speed.updateTimer();
