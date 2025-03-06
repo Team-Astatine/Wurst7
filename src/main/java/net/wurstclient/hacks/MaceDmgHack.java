@@ -38,34 +38,6 @@ public final class MaceDmgHack extends Hack
 		"Debugging", "description.wurst.setting.MaceDmg.Debugging", false);
 	
 	private List<Block> ignoreBlocks = new ArrayList<>();
-	private int[] sqrtValues = {0, 0, 0, 1, 4, 10, 17, 27, 38, 51, 67, 84, 104,
-		125, 148, 174, 201, 231, 262, 295, 331, 368, 408, 449, 492};
-	/*
-	 * 1, 0
-	 * 2, 0
-	 * 3, 1
-	 * 4, 4
-	 * 5, 10
-	 * 6, 17
-	 * 7, 27
-	 * 8, 38
-	 * 9, 51
-	 * 10, 67
-	 * 11, 84
-	 * 12, 104
-	 * 13, 125
-	 * 14, 148
-	 * 15, 174
-	 * 16, 201
-	 * 17, 231
-	 * 18, 262
-	 * 19, 295
-	 * 20, 331
-	 * 21, 368
-	 * 22, 408
-	 * 23, 449
-	 * 24, 492
-	 */
 	
 	public MaceDmgHack()
 	{
@@ -112,15 +84,28 @@ public final class MaceDmgHack extends Hack
 		
 		if(higher < 1)
 			return;
-		else if(higher > 24)
-			sqrtValue.setValue(500);
+		else if(higher <= 2)
+			sqrtValue.setValue(0);
 		else
-			sqrtValue.setValue(sqrtValues[higher]);
+			sqrtValue.setValue( calculateSqrtValue(higher));
 		
 		for(int i = 0; i < 4; i++)
 			sendFakeY(0);
 		sendFakeY(Math.sqrt(sqrtValue.getValue()));
 		sendFakeY(0);
+	}
+	
+	private int calculateSqrtValue(int n)
+	{
+		if(n < 3)
+			return 0;
+		
+		int m = (n - 3) / 5;
+		int s = (n - 3) % 5;
+		int[] c = {1, 4, 10, 17, 27};
+		
+		int a_n = 25 * m * (m - 1) + m * (27 + 10 * (s + 1)) + c[s];
+		return a_n;
 	}
 	
 	private int getMaximumHeight(ClientPlayerEntity player)
