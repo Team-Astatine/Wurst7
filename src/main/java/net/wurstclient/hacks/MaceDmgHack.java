@@ -87,7 +87,7 @@ public final class MaceDmgHack extends Hack
 		else if(higher <= 2)
 			sqrtValue.setValue(0);
 		else
-			sqrtValue.setValue( calculateSqrtValue(higher));
+			sqrtValue.setValue(calculateSqrtValue(higher));
 		
 		for(int i = 0; i < 4; i++)
 			sendFakeY(0);
