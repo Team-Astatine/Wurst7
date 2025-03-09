@@ -78,10 +78,10 @@ public final class NoFallHack extends Hack implements UpdateListener
 		boolean fallFlying = player.isGliding();
 		if(fallFlying && !allowElytra.isChecked())
 			return;
-		
+			
 		// pause when holding a mace, if enabled
-		if(pauseForMace.isChecked() && isHoldingMace(player))
-			return;
+		// if(pauseForMace.isChecked() && isHoldingMace(player))
+		// return;
 		
 		// attempt to fix elytra weirdness, if allowed
 		if(fallFlying && player.isSneaking()
