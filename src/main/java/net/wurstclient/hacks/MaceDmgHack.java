@@ -82,10 +82,8 @@ public final class MaceDmgHack extends Hack
 			ChatUtils.message(String.valueOf(sqrtValue.getValue()));
 		}
 		
-		if(higher < 1)
+		if(higher <= 2)
 			return;
-		else if(higher <= 2)
-			sqrtValue.setValue(0);
 		else
 			sqrtValue.setValue(calculateSqrtValue(higher));
 		
