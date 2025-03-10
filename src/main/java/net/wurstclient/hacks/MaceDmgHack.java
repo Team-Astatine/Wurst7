@@ -125,7 +125,7 @@ public final class MaceDmgHack extends Hack
 				break;
 		}
 		
-		return maxAvailableHeight;
+		return maxAvailableHeight - 1;
 	}
 	
 	private void sendFakeY(double offset)
