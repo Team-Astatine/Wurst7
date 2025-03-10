@@ -53,8 +53,8 @@ public final class MaceDmgHack extends Hack
 		ignoreBlocks.add(Blocks.COBWEB);
 		ignoreBlocks.add(Blocks.VOID_AIR);
 		ignoreBlocks.add(Blocks.LAVA);
-		ignoreBlocks.add(Blocks.GLASS);
-		ignoreBlocks.add(Blocks.SHORT_GRASS);
+		ignoreBlocks.add(Blocks.KELP);
+		ignoreBlocks.add(Blocks.KELP_PLANT);
 	}
 	
 	@Override
@@ -111,7 +111,7 @@ public final class MaceDmgHack extends Hack
 		int MAX_HEIGHT = 500;
 		int maxAvailableHeight = 0;
 		
-		for(int i = (int)player.getY(); i < MAX_HEIGHT; i++)
+		for(int i = (int)player.getY() + 1; i < MAX_HEIGHT; i++)
 		{
 			BlockPos blockPos =
 				BlockPos.ofFloored(player.getX(), i, player.getZ());
