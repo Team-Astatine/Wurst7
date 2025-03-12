@@ -30,9 +30,13 @@ import java.util.List;
 public final class MaceDmgHack extends Hack
 	implements PlayerAttacksEntityListener
 {
+	private final SliderSetting MAX_DMG_HIGH = new SliderSetting(
+		"Mace Max Dmg n Higher", "description.wurst.setting.maceDmg.maxDmgHigh",
+		500, 1, 2000, 1, SliderSetting.ValueDisplay.DECIMAL);
+	
 	private final SliderSetting sqrtValue = new SliderSetting("Mace Sqrt Value",
-		"description.wurst.setting.maceDmg.SqrtValue", 300, 1, 2000, 1,
-		SliderSetting.ValueDisplay.DECIMAL);
+		"description.wurst.setting.maceDmg.SqrtValue", 500, 1,
+		MAX_DMG_HIGH.getValue(), 1, SliderSetting.ValueDisplay.DECIMAL);
 	
 	private final CheckboxSetting debuggingButton = new CheckboxSetting(
 		"Debugging", "description.wurst.setting.MaceDmg.Debugging", false);
@@ -44,6 +48,7 @@ public final class MaceDmgHack extends Hack
 		super("MaceDMG");
 		setCategory(Category.COMBAT);
 		
+		addSetting(MAX_DMG_HIGH);
 		addSetting(sqrtValue);
 		addSetting(debuggingButton);
 		
@@ -108,7 +113,7 @@ public final class MaceDmgHack extends Hack
 	
 	private int getMaximumHeight(ClientPlayerEntity player)
 	{
-		int MAX_HEIGHT = 2000;
+		int MAX_HEIGHT = MAX_DMG_HIGH.getValueI();
 		int maxAvailableHeight = 0;
 		
 		for(int i = (int)player.getY() + 1; i < MAX_HEIGHT; i++)
