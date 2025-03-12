@@ -31,7 +31,7 @@ public final class MaceDmgHack extends Hack
 	implements PlayerAttacksEntityListener
 {
 	private final SliderSetting sqrtValue = new SliderSetting("Mace Sqrt Value",
-		"description.wurst.setting.maceDmg.SqrtValue", 300, 1, 3000, 1,
+		"description.wurst.setting.maceDmg.SqrtValue", 300, 1, 2000, 1,
 		SliderSetting.ValueDisplay.DECIMAL);
 	
 	private final CheckboxSetting debuggingButton = new CheckboxSetting(
@@ -108,7 +108,7 @@ public final class MaceDmgHack extends Hack
 	
 	private int getMaximumHeight(ClientPlayerEntity player)
 	{
-		int MAX_HEIGHT = 3000;
+		int MAX_HEIGHT = 2000;
 		int maxAvailableHeight = 0;
 		
 		for(int i = (int)player.getY() + 1; i < MAX_HEIGHT; i++)
