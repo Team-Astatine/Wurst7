@@ -14,11 +14,11 @@ import java.util.stream.Stream;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
 import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -34,8 +34,8 @@ import net.wurstclient.util.RotationUtils;
 public final class ClickAuraHack extends Hack
 	implements UpdateListener, LeftClickListener
 {
-	private final SliderSetting range =
-		new SliderSetting("Range", 5, 1, 10, 0.05, ValueDisplay.DECIMAL);
+	// private final SliderSetting range =
+	// new SliderSetting("Range", 5, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
 	private final AttackSpeedSliderSetting speed =
 		new AttackSpeedSliderSetting();
@@ -58,7 +58,7 @@ public final class ClickAuraHack extends Hack
 		super("ClickAura");
 		
 		setCategory(Category.COMBAT);
-		addSetting(range);
+		// addSetting(range);
 		addSetting(speed);
 		addSetting(priority);
 		addSetting(fov);
@@ -98,12 +98,11 @@ public final class ClickAuraHack extends Hack
 		if(!MC.options.attackKey.isPressed())
 			return;
 		
-		int setAttackSpeed = 0;
-		ItemStack mainHandItem = MC.player.getInventory().getMainHandStack();
-		if(mainHandItem.getItem() == Items.MACE)
-			setAttackSpeed = 20;
-		else
-			setAttackSpeed = 0;
+		ClientPlayerEntity player = MC.player;
+		boolean isMainHandHoldingMace =
+			player.getInventory().getMainHandStack().isOf(Items.MACE);
+		
+		int setAttackSpeed = isMainHandHoldingMace ? 40 : 0;
 		speed.setAttackSpeed(setAttackSpeed);
 		
 		speed.updateTimer();
@@ -125,7 +124,8 @@ public final class ClickAuraHack extends Hack
 		ClientPlayerEntity player = MC.player;
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
 		
-		double rangeSq = Math.pow(range.getValue(), 2);
+		double rangeSq = Math
+			.pow(WurstClient.INSTANCE.getHax().reachHack.getReachDistance(), 2);
 		stream = stream.filter(e -> player.squaredDistanceTo(e) <= rangeSq);
 		
 		if(fov.getValue() < 360.0)
