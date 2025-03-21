@@ -26,7 +26,7 @@ import net.wurstclient.util.ChatUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-@SearchTags({"mace dmg", "MaceDamage", "mace damage"})
+@SearchTags({"mace dmg", "MaceDamage", "mace damage", "mace"})
 public final class MaceDmgHack extends Hack
 	implements PlayerAttacksEntityListener
 {
