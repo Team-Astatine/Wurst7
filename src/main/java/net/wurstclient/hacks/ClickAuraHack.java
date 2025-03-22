@@ -34,8 +34,8 @@ import net.wurstclient.util.RotationUtils;
 public final class ClickAuraHack extends Hack
 	implements UpdateListener, LeftClickListener
 {
-	// private final SliderSetting range =
-	// new SliderSetting("Range", 5, 1, 10, 0.05, ValueDisplay.DECIMAL);
+	private final SliderSetting range =
+		new SliderSetting("Range", 5, 1, 10, 0.05, ValueDisplay.DECIMAL);
 	
 	private final AttackSpeedSliderSetting speed =
 		new AttackSpeedSliderSetting();
@@ -58,7 +58,7 @@ public final class ClickAuraHack extends Hack
 		super("ClickAura");
 		
 		setCategory(Category.COMBAT);
-		// addSetting(range);
+		addSetting(range);
 		addSetting(speed);
 		addSetting(priority);
 		addSetting(fov);
