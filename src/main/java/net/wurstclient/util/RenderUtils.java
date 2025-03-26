@@ -12,7 +12,6 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.block.Blocks;
@@ -115,10 +114,6 @@ public enum RenderUtils
 	public static void drawLine(MatrixStack matrices, Vec3d start, Vec3d end,
 		int color, boolean depthTest)
 	{
-		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(depthFunc);
-		
 		VertexConsumerProvider.Immediate vcp = getVCP();
 		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
 		VertexConsumer buffer = vcp.getBuffer(layer);
@@ -142,10 +137,6 @@ public enum RenderUtils
 	public static void drawTracer(MatrixStack matrices, float partialTicks,
 		Vec3d end, int color, boolean depthTest)
 	{
-		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(depthFunc);
-		
 		VertexConsumerProvider.Immediate vcp = getVCP();
 		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
 		VertexConsumer buffer = vcp.getBuffer(layer);
@@ -160,10 +151,6 @@ public enum RenderUtils
 	public static void drawTracers(MatrixStack matrices, float partialTicks,
 		List<Vec3d> ends, int color, boolean depthTest)
 	{
-		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(depthFunc);
-		
 		VertexConsumerProvider.Immediate vcp = getVCP();
 		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
 		VertexConsumer buffer = vcp.getBuffer(layer);
@@ -179,10 +166,6 @@ public enum RenderUtils
 	public static void drawTracers(MatrixStack matrices, float partialTicks,
 		List<ColoredPoint> ends, boolean depthTest)
 	{
-		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(depthFunc);
-		
 		VertexConsumerProvider.Immediate vcp = getVCP();
 		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
 		VertexConsumer buffer = vcp.getBuffer(layer);
@@ -240,10 +223,6 @@ public enum RenderUtils
 	public static void drawCurvedLine(MatrixStack matrices, List<Vec3d> points,
 		int color, boolean depthTest)
 	{
-		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(depthFunc);
-		
 		VertexConsumerProvider.Immediate vcp = getVCP();
 		RenderLayer layer = WurstRenderLayers.getLineStrip(depthTest);
 		VertexConsumer buffer = vcp.getBuffer(layer);
@@ -279,10 +258,6 @@ public enum RenderUtils
 	public static void drawSolidBox(MatrixStack matrices, Box box, int color,
 		boolean depthTest)
 	{
-		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(depthFunc);
-		
 		VertexConsumerProvider.Immediate vcp = getVCP();
 		RenderLayer layer = WurstRenderLayers.getQuads(depthTest);
 		VertexConsumer buffer = vcp.getBuffer(layer);
@@ -296,10 +271,6 @@ public enum RenderUtils
 	public static void drawSolidBoxes(MatrixStack matrices, List<Box> boxes,
 		int color, boolean depthTest)
 	{
-		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(depthFunc);
-		
 		VertexConsumerProvider.Immediate vcp = getVCP();
 		RenderLayer layer = WurstRenderLayers.getQuads(depthTest);
 		VertexConsumer buffer = vcp.getBuffer(layer);
@@ -314,10 +285,6 @@ public enum RenderUtils
 	public static void drawSolidBoxes(MatrixStack matrices,
 		List<ColoredBox> boxes, boolean depthTest)
 	{
-		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(depthFunc);
-		
 		VertexConsumerProvider.Immediate vcp = getVCP();
 		RenderLayer layer = WurstRenderLayers.getQuads(depthTest);
 		VertexConsumer buffer = vcp.getBuffer(layer);
@@ -380,10 +347,6 @@ public enum RenderUtils
 	public static void drawOutlinedBox(MatrixStack matrices, Box box, int color,
 		boolean depthTest)
 	{
-		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(depthFunc);
-		
 		VertexConsumerProvider.Immediate vcp = getVCP();
 		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
 		VertexConsumer buffer = vcp.getBuffer(layer);
@@ -397,10 +360,6 @@ public enum RenderUtils
 	public static void drawOutlinedBoxes(MatrixStack matrices, List<Box> boxes,
 		int color, boolean depthTest)
 	{
-		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(depthFunc);
-		
 		VertexConsumerProvider.Immediate vcp = getVCP();
 		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
 		VertexConsumer buffer = vcp.getBuffer(layer);
@@ -415,10 +374,6 @@ public enum RenderUtils
 	public static void drawOutlinedBoxes(MatrixStack matrices,
 		List<ColoredBox> boxes, boolean depthTest)
 	{
-		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(depthFunc);
-		
 		VertexConsumerProvider.Immediate vcp = getVCP();
 		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
 		VertexConsumer buffer = vcp.getBuffer(layer);
@@ -482,10 +437,6 @@ public enum RenderUtils
 	public static void drawCrossBox(MatrixStack matrices, Box box, int color,
 		boolean depthTest)
 	{
-		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(depthFunc);
-		
 		VertexConsumerProvider.Immediate vcp = getVCP();
 		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
 		VertexConsumer buffer = vcp.getBuffer(layer);
@@ -499,10 +450,6 @@ public enum RenderUtils
 	public static void drawCrossBoxes(MatrixStack matrices, List<Box> boxes,
 		int color, boolean depthTest)
 	{
-		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(depthFunc);
-		
 		VertexConsumerProvider.Immediate vcp = getVCP();
 		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
 		VertexConsumer buffer = vcp.getBuffer(layer);
@@ -517,10 +464,6 @@ public enum RenderUtils
 	public static void drawCrossBoxes(MatrixStack matrices,
 		List<ColoredBox> boxes, boolean depthTest)
 	{
-		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(depthFunc);
-		
 		VertexConsumerProvider.Immediate vcp = getVCP();
 		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
 		VertexConsumer buffer = vcp.getBuffer(layer);
@@ -589,10 +532,6 @@ public enum RenderUtils
 	public static void drawNode(MatrixStack matrices, Box box, int color,
 		boolean depthTest)
 	{
-		int depthFunc = depthTest ? GlConst.GL_LEQUAL : GlConst.GL_ALWAYS;
-		RenderSystem.enableDepthTest();
-		RenderSystem.depthFunc(depthFunc);
-		
 		VertexConsumerProvider.Immediate vcp = getVCP();
 		RenderLayer layer = WurstRenderLayers.getLines(depthTest);
 		VertexConsumer buffer = vcp.getBuffer(layer);
