@@ -100,7 +100,7 @@ public final class ClickAuraHack extends Hack
 		
 		ClientPlayerEntity player = MC.player;
 		boolean isMainHandHoldingMace =
-			player.getInventory().getMainHandStack().isOf(Items.MACE);
+			player.getMainHandStack().isOf(Items.MACE);
 		
 		int setAttackSpeed = isMainHandHoldingMace ? 40 : 0;
 		speed.setAttackSpeed(setAttackSpeed);
