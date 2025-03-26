@@ -19,7 +19,6 @@ import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.AttackSpeedSliderSetting;
@@ -35,8 +34,8 @@ import net.wurstclient.util.RotationUtils;
 @SearchTags({"multi aura", "ForceField", "force field"})
 public final class MultiAuraHack extends Hack implements UpdateListener
 {
-	// private final SliderSetting range =
-	// new SliderSetting("Range", 5, 1, 10, 0.05, ValueDisplay.DECIMAL);
+	private final SliderSetting range =
+		new SliderSetting("Range", 5, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
 	private AttackSpeedSliderSetting speed = new AttackSpeedSliderSetting();
 	
@@ -57,7 +56,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 		super("MultiAura");
 		setCategory(Category.COMBAT);
 		
-		// addSetting(range);
+		addSetting(range);
 		addSetting(speed);
 		addSetting(fov);
 		addSetting(swingHand);
@@ -108,8 +107,7 @@ public final class MultiAuraHack extends Hack implements UpdateListener
 			return;
 		
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
-		double rangeSq = Math
-			.pow(WurstClient.INSTANCE.getHax().reachHack.getReachDistance(), 2);
+		double rangeSq = Math.pow(range.getValue(), 2);
 		stream = stream.filter(e -> MC.player.squaredDistanceTo(e) <= rangeSq);
 		
 		if(fov.getValue() < 360.0)

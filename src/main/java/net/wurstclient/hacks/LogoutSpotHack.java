@@ -72,14 +72,13 @@ public final class LogoutSpotHack extends Hack
 		EVENTS.remove(RenderListener.class, this);
 	}
 	
-	/*
-	 * 1. 전체 플레이어를 가져온다.
-	 * 2. 플레이어 변화가 없으면 스킵한다.
-	 * 3. 이전 플레이어(lastPlayers) 중 현재 온라인 플레이어(onlinePlayers)에 없는 플레이어를 찾는다.
-	 * 단, 해당 플레이어가 렌더링되고 있는 경우(renderPlayers에 존재하면) 그 위치 정보로 logoutEntries에
-	 * 추가한다.
-	 * 4. logoutEntries에서 렌더링되지 않는 항목은 제거한다.
-	 * 5. 마지막에 lastPlayers를 현재 onlinePlayers의 모든 UUID로 교체한다.
+	/**
+	 * 1. {@link MinecraftClient#getInstance()} 서버 전체 PlayerList 를 가져온다.
+	 * 2. lastPlayerList 와 전체 PlayerList 가 다름이 없다면 SKIP.
+	 * 3. lastPlayerList 와 신규 PlayerList 가 다르고, 시야에 Rendering 되는 Player 라면,
+	 * logoutEntries 에 추가한다.
+	 * 4. logoutEntries 에 시야에 Rendering 되지 않는 Player 는 제거한다.
+	 * 5. lastPlayerList 를 신규 PlayerList 로 변경한다.
 	 */
 	@Override
 	public void onUpdate()
