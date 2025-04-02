@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -43,6 +44,7 @@ public final class LogoutSpotHack extends Hack
 	private Map<UUID, Vec3d> renderPlayers = new HashMap<>();
 	private Map<UUID, String> lastPlayers = new HashMap<>();
 	private final Map<UUID, Entry> logOutPlayers = new HashMap<>();
+	private String currentJoinServer;
 	
 	public LogoutSpotHack()
 	{
@@ -56,6 +58,25 @@ public final class LogoutSpotHack extends Hack
 				.removeIf(entry -> Instant.now().isAfter(
 					entry.getValue().instant.plus(10, ChronoUnit.MINUTES))),
 			0, 5, TimeUnit.MINUTES);
+		
+		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+			
+			MinecraftClient mcClient = MinecraftClient.getInstance();
+			if(mcClient.getNetworkHandler() == null)
+				return;
+			
+			if(mcClient.getNetworkHandler().getConnection() == null)
+				return;
+			
+			String serverAddress = mcClient.getNetworkHandler().getConnection()
+				.getAddress().toString();
+			
+			if(serverAddress.equals(currentJoinServer))
+				return;
+			
+			currentJoinServer = serverAddress;
+			logOutPlayers.clear();
+		});
 	}
 	
 	@Override
