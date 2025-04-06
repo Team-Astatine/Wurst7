@@ -77,7 +77,7 @@ public final class ArrowDmgHack extends Hack implements StopUsingItemListener
 		Vec3d lookVec = player.getRotationVec(1).multiply(adjustedStrength);
 		for(int i = 0; i < 4; i++)
 			sendPos(x, y, z, true);
-		sendPos(x - lookVec.x, y, z - lookVec.z, true);
+		sendPos(x - lookVec.x, y - lookVec.y, z - lookVec.z, true);
 		sendPos(x, y, z, false);
 	}
 	
