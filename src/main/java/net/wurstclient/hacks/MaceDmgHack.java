@@ -10,6 +10,7 @@ package net.wurstclient.hacks;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Items;
@@ -130,7 +131,8 @@ public final class MaceDmgHack extends Hack
 	
 	private void sendFakeY(double offset)
 	{
-		MC.player.networkHandler.sendPacket(
+		ClientPlayNetworkHandler netHandler = MC.player.networkHandler;
+		netHandler.sendPacket(
 			new PositionAndOnGround(MC.player.getX(), MC.player.getY() + offset,
 				MC.player.getZ(), false, MC.player.horizontalCollision));
 	}
