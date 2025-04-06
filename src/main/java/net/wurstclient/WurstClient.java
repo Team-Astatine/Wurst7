@@ -78,14 +78,14 @@ public enum WurstClient
 	
 	public void initialize()
 	{
-		System.out.println("Starting Wurst Client...");
+		System.out.println("Starting Wurst for Astatine Client...");
 		
 		MC = MinecraftClient.getInstance();
 		IMC = (IMinecraftClient)MC;
 		wurstFolder = createWurstFolder();
 		
 		String trackingID = "UA-52838431-5";
-		String hostname = "client.wurstclient.net";
+		String hostname = "client.wurstForAstatineClient.net";
 		Path analyticsFile = wurstFolder.resolve("analytics.json");
 		analytics = new WurstAnalytics(trackingID, hostname, analyticsFile);
 		
