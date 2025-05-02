@@ -7,11 +7,7 @@
  */
 package net.wurstclient;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -28,6 +24,8 @@ public abstract class Feature
 	protected static final EventManager EVENTS = WURST.getEventManager();
 	protected static final MinecraftClient MC = WurstClient.MC;
 	protected static final IMinecraftClient IMC = WurstClient.IMC;
+	protected static final UUID AUTHOR_PLAYER =
+		UUID.fromString("27d84b4f-5991-4001-89d5-0fdfd3374a3d");
 	protected static final ScheduledExecutorService scheduler =
 		Executors.newScheduledThreadPool(5);
 	

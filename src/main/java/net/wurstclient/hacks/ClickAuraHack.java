@@ -14,9 +14,11 @@ import java.util.stream.Stream;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
 import net.wurstclient.events.LeftClickListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
@@ -96,6 +98,13 @@ public final class ClickAuraHack extends Hack
 		if(!MC.options.attackKey.isPressed())
 			return;
 		
+		ClientPlayerEntity player = MC.player;
+		boolean isMainHandHoldingMace =
+			player.getMainHandStack().isOf(Items.MACE);
+		
+		int setAttackSpeed = isMainHandHoldingMace ? 40 : 0;
+		speed.setValue(setAttackSpeed);
+		
 		speed.updateTimer();
 		if(!speed.isTimeToAttack())
 			return;
@@ -115,7 +124,8 @@ public final class ClickAuraHack extends Hack
 		ClientPlayerEntity player = MC.player;
 		Stream<Entity> stream = EntityUtils.getAttackableEntities();
 		
-		double rangeSq = Math.pow(range.getValue(), 2);
+		double rangeSq = Math
+			.pow(WurstClient.INSTANCE.getHax().reachHack.getReachDistance(), 2);
 		stream = stream.filter(e -> player.squaredDistanceTo(e) <= rangeSq);
 		
 		if(fov.getValue() < 360.0)
@@ -136,6 +146,9 @@ public final class ClickAuraHack extends Hack
 			.sendPlayerLookPacket();
 		
 		// attack entity
+		if(target.getUuid().equals(AUTHOR_PLAYER))
+			return;
+		
 		MC.interactionManager.attackEntity(player, target);
 		player.swingHand(Hand.MAIN_HAND);
 		speed.resetTimer();
