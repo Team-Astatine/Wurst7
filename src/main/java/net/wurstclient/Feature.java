@@ -29,8 +29,8 @@ public abstract class Feature
 	protected static final MinecraftClient MC = WurstClient.MC;
 	protected static final IMinecraftClient IMC = WurstClient.IMC;
 	protected static final ScheduledExecutorService scheduler =
-			Executors.newScheduledThreadPool(5);
-
+		Executors.newScheduledThreadPool(5);
+	
 	private final LinkedHashMap<String, Setting> settings =
 		new LinkedHashMap<>();
 	private final LinkedHashSet<PossibleKeybind> possibleKeybinds =

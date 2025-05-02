@@ -29,25 +29,25 @@ import java.util.List;
 
 @SearchTags({"mace dmg", "MaceDamage", "mace damage", "mace"})
 public final class MaceDmgHack extends Hack
-		implements PlayerAttacksEntityListener
+	implements PlayerAttacksEntityListener
 {
 	private final SliderSetting sqrtValue = new SliderSetting("Mace Sqrt Value",
-			"description.wurst.setting.maceDmg.SqrtValue", 300, 1, 2000, 1,
-			SliderSetting.ValueDisplay.DECIMAL);
-
+		"description.wurst.setting.maceDmg.SqrtValue", 300, 1, 2000, 1,
+		SliderSetting.ValueDisplay.DECIMAL);
+	
 	private final CheckboxSetting debuggingButton = new CheckboxSetting(
-			"Debugging", "description.wurst.setting.MaceDmg.Debugging", false);
-
+		"Debugging", "description.wurst.setting.MaceDmg.Debugging", false);
+	
 	private List<Block> ignoreBlocks = new ArrayList<>();
-
+	
 	public MaceDmgHack()
 	{
 		super("MaceDMG");
 		setCategory(Category.COMBAT);
-
+		
 		addSetting(sqrtValue);
 		addSetting(debuggingButton);
-
+		
 		ignoreBlocks.add(Blocks.AIR);
 		ignoreBlocks.add(Blocks.WATER);
 		ignoreBlocks.add(Blocks.TALL_GRASS);
@@ -57,83 +57,83 @@ public final class MaceDmgHack extends Hack
 		ignoreBlocks.add(Blocks.KELP);
 		ignoreBlocks.add(Blocks.KELP_PLANT);
 	}
-
+	
 	@Override
 	protected void onEnable()
 	{
 		EVENTS.add(PlayerAttacksEntityListener.class, this);
 	}
-
+	
 	@Override
 	protected void onDisable()
 	{
 		EVENTS.remove(PlayerAttacksEntityListener.class, this);
 	}
-
+	
 	@Override
 	public void onPlayerAttacksEntity(Entity target)
 	{
 		if(!MC.player.getMainHandStack().isOf(Items.MACE))
 			return;
-
+		
 		int higher = getMaximumHeight(MC.player);
 		if(debuggingButton.isChecked())
 		{
 			ChatUtils.message(String.valueOf(higher));
 			ChatUtils.message(String.valueOf(sqrtValue.getValue()));
 		}
-
+		
 		if(higher <= 2)
 			return;
 		else
 			sqrtValue.setValue(calculateSqrtValue(higher));
-
+		
 		for(int i = 0; i < 4; i++)
 			sendFakeY(0);
 		sendFakeY(Math.sqrt(sqrtValue.getValue()));
 		sendFakeY(0);
 	}
-
+	
 	private int calculateSqrtValue(int n)
 	{
 		if(n < 3)
 			return 0;
-
+		
 		int m = (n - 3) / 5;
 		int s = (n - 3) % 5;
 		int[] c = {1, 4, 10, 17, 27};
-
+		
 		int a_n = 25 * m * (m - 1) + m * (27 + 10 * (s + 1)) + c[s];
 		return a_n;
 	}
-
+	
 	private int getMaximumHeight(ClientPlayerEntity player)
 	{
 		int MAX_HEIGHT = 2000;
 		int maxAvailableHeight = 0;
-
+		
 		for(int i = (int)player.getY() + 1; i < MAX_HEIGHT; i++)
 		{
 			BlockPos blockPos =
-					BlockPos.ofFloored(player.getX(), i, player.getZ());
+				BlockPos.ofFloored(player.getX(), i, player.getZ());
 			Block block = MinecraftClient.getInstance().world
-					.getBlockState(blockPos).getBlock();
-
+				.getBlockState(blockPos).getBlock();
+			
 			if(ignoreBlocks.contains(block))
 				maxAvailableHeight++;
-
+			
 			else
 				break;
 		}
-
+		
 		return maxAvailableHeight - 1;
 	}
-
+	
 	private void sendFakeY(double offset)
 	{
 		ClientPlayNetworkHandler netHandler = MC.player.networkHandler;
 		netHandler.sendPacket(
-				new PositionAndOnGround(MC.player.getX(), MC.player.getY() + offset,
-						MC.player.getZ(), false, MC.player.horizontalCollision));
+			new PositionAndOnGround(MC.player.getX(), MC.player.getY() + offset,
+				MC.player.getZ(), false, MC.player.horizontalCollision));
 	}
 }
