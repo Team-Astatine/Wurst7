@@ -39,7 +39,7 @@ public abstract class GameMenuScreenMixin extends Screen
 {
 	@Unique
 	private static final Identifier WURST_TEXTURE =
-		Identifier.of("wurst", "wurst_128.png");
+		Identifier.of("wurst", "logo_title.png");
 	
 	@Unique
 	private ButtonWidget wurstOptionsButton;

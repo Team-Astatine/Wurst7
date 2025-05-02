@@ -19,7 +19,7 @@ public final class WurstLogo
 {
 	private static final WurstClient WURST = WurstClient.INSTANCE;
 	private static final Identifier LOGO_TEXTURE =
-		Identifier.of("wurst", "wurst_128.png");
+		Identifier.of("wurst", "logo_title.png");
 	
 	public void render(DrawContext context)
 	{
