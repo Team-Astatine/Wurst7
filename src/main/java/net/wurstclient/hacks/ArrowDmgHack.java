@@ -27,13 +27,13 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class ArrowDmgHack extends Hack implements StopUsingItemListener
 {
 	private final SliderSetting strength = new SliderSetting("Strength",
-		"description.wurst.setting.arrowdmg.strength", 10, 0.1, 10, 0.1,
-		ValueDisplay.DECIMAL);
-	
+			"description.wurst.setting.arrowdmg.strength", 10, 0.1, 100, 0.1,
+			ValueDisplay.DECIMAL);
+
 	private final CheckboxSetting yeetTridents =
-		new CheckboxSetting("Trident yeet mode",
-			"description.wurst.setting.arrowdmg.trident_yeet_mode", false);
-	
+			new CheckboxSetting("Trident yeet mode",
+					"description.wurst.setting.arrowdmg.trident_yeet_mode", false);
+
 	public ArrowDmgHack()
 	{
 		super("ArrowDMG");
@@ -41,58 +41,58 @@ public final class ArrowDmgHack extends Hack implements StopUsingItemListener
 		addSetting(strength);
 		addSetting(yeetTridents);
 	}
-	
+
 	@Override
 	protected void onEnable()
 	{
 		EVENTS.add(StopUsingItemListener.class, this);
 	}
-	
+
 	@Override
 	protected void onDisable()
 	{
 		EVENTS.remove(StopUsingItemListener.class, this);
 	}
-	
+
 	@Override
 	public void onStopUsingItem()
 	{
 		ClientPlayerEntity player = MC.player;
 		ClientPlayNetworkHandler netHandler = player.networkHandler;
-		
+
 		if(!isValidItem(player.getMainHandStack().getItem()))
 			return;
-		
+
 		netHandler.sendPacket(
-			new ClientCommandC2SPacket(player, Mode.START_SPRINTING));
-		
+				new ClientCommandC2SPacket(player, Mode.START_SPRINTING));
+
 		double x = player.getX();
 		double y = player.getY();
 		double z = player.getZ();
-		
+
 		// See ServerPlayNetworkHandler.onPlayerMove()
 		// for why it's using these numbers.
 		// Also, let me know if you find a way to bypass that check in 1.21.
-		double adjustedStrength = strength.getValue() / 10.0 * Math.sqrt(500);
+		double adjustedStrength = strength.getValue() / 10.0 * Math.sqrt(300);
 		Vec3d lookVec = player.getRotationVec(1).multiply(adjustedStrength);
 		for(int i = 0; i < 4; i++)
 			sendPos(x, y, z, true);
-		sendPos(x - lookVec.x, y, z - lookVec.z, true);
+		sendPos(x - lookVec.x, y - lookVec.y, z - lookVec.z, true);
 		sendPos(x, y, z, false);
 	}
-	
+
 	private void sendPos(double x, double y, double z, boolean onGround)
 	{
 		ClientPlayNetworkHandler netHandler = MC.player.networkHandler;
 		netHandler.sendPacket(new PositionAndOnGround(x, y, z, onGround,
-			MC.player.horizontalCollision));
+				MC.player.horizontalCollision));
 	}
-	
+
 	private boolean isValidItem(Item item)
 	{
 		if(yeetTridents.isChecked() && item == Items.TRIDENT)
 			return true;
-		
+
 		return item == Items.BOW;
 	}
 }

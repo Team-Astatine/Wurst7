@@ -12,6 +12,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import net.minecraft.client.MinecraftClient;
 import net.wurstclient.event.EventManager;
@@ -26,7 +28,9 @@ public abstract class Feature
 	protected static final EventManager EVENTS = WURST.getEventManager();
 	protected static final MinecraftClient MC = WurstClient.MC;
 	protected static final IMinecraftClient IMC = WurstClient.IMC;
-	
+	protected static final ScheduledExecutorService scheduler =
+			Executors.newScheduledThreadPool(5);
+
 	private final LinkedHashMap<String, Setting> settings =
 		new LinkedHashMap<>();
 	private final LinkedHashSet<PossibleKeybind> possibleKeybinds =
