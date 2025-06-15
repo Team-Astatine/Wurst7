@@ -94,7 +94,7 @@ public final class MassWhisperHack extends Hack
 		Collections.shuffle(players, random);
 		
 		EVENTS.add(UpdateListener.class, this);
-    	EVENTS.add(ChatInputListener.class, this);
+		EVENTS.add(ChatInputListener.class, this);
 		EVENTS.add(ChatOutputListener.class, this);
 		
 		if(players.isEmpty())
@@ -105,7 +105,8 @@ public final class MassWhisperHack extends Hack
 	}
 	
 	@Override
-	protected void onDisable() {
+	protected void onDisable()
+	{
 		EVENTS.remove(UpdateListener.class, this);
 		EVENTS.remove(ChatInputListener.class, this);
 		EVENTS.remove(ChatOutputListener.class, this);
