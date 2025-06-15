@@ -9,9 +9,9 @@ package net.wurstclient.hacks.massWhispering;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.regex.Pattern;
 
 import net.minecraft.client.network.PlayerListEntry;
@@ -54,7 +54,7 @@ public final class MassWhisperHack extends Hack
 	
 	private final Random random = new Random();
 	private final ArrayList<String> players = new ArrayList<>();
-	private final BlockingQueue<String> message = new LinkedBlockingDeque<>();
+	private final Queue<String> message = new LinkedList<>();
 	
 	private String command;
 	private int timer;
@@ -126,16 +126,12 @@ public final class MassWhisperHack extends Hack
 			return;
 		}
 		
+		// System.out.println("message size > " + message.size());
+		// System.out.println("message > " + message);
+		// System.out.println("players size > " + players);
+		
+		String comment = message.poll();
 		players.forEach(player -> {
-			String comment = "";
-			try
-			{
-				comment = message.take();
-			}catch(InterruptedException e)
-			{
-				e.printStackTrace();
-			}
-			
 			MC.getNetworkHandler().sendChatCommand(
 				String.format("%s %s %s", command, player, comment));
 		});
@@ -146,6 +142,9 @@ public final class MassWhisperHack extends Hack
 	@Override
 	public void onSentMessage(ChatOutputEvent event)
 	{
+		// System.out.println("oringinal msg -> " + event.getOriginalMessage());
+		// System.out.println(" msg -> " + event.getMessage());
+		
 		message.offer(event.getOriginalMessage());
 		event.cancel();
 	}
