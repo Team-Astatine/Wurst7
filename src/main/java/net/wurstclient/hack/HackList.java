@@ -24,6 +24,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hacks.*;
+import net.wurstclient.hacks.massWhispering.MassWhisperHack;
 import net.wurstclient.util.json.JsonException;
 
 public final class HackList implements UpdateListener
@@ -127,6 +128,7 @@ public final class HackList implements UpdateListener
 	public final LiquidsHack liquidsHack = new LiquidsHack();
 	public final LsdHack lsdHack = new LsdHack();
 	public final MaceDmgHack maceDmgHack = new MaceDmgHack();
+	public final MassWhisperHack massWhisperHack = new MassWhisperHack();
 	public final MassTpaHack massTpaHack = new MassTpaHack();
 	public final MileyCyrusHack mileyCyrusHack = new MileyCyrusHack();
 	public final MobEspHack mobEspHack = new MobEspHack();
