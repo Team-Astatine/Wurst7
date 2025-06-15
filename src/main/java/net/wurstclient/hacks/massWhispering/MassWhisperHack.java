@@ -58,6 +58,7 @@ public final class MassWhisperHack extends Hack
 	
 	private String command;
 	private int timer;
+	private int index;
 	
 	public MassWhisperHack()
 	{
@@ -74,6 +75,7 @@ public final class MassWhisperHack extends Hack
 		// reset state
 		players.clear();
 		timer = 0;
+		index = 0;
 		
 		// cache command in case the setting is changed mid-run
 		command = commandSetting.getValue().substring(1);
@@ -126,17 +128,22 @@ public final class MassWhisperHack extends Hack
 			return;
 		}
 		
-		// System.out.println("message size > " + message.size());
-		// System.out.println("message > " + message);
-		// System.out.println("players size > " + players);
+		String comment = message.peek();
+		String target = players.get(index);
 		
-		String comment = message.poll();
-		players.forEach(player -> {
-			MC.getNetworkHandler().sendChatCommand(
-				String.format("%s %s %s", command, player, comment));
-		});
+		MC.getNetworkHandler().sendChatCommand(
+			String.format("%s %s %s", command, target, comment));
 		
+		index++;
 		timer = delay.getValueI() - 1;
+		
+		// If we've messaged all players for this comment, remove the comment
+		// and reset index
+		if(index >= players.size())
+		{
+			message.poll();
+			index = 0;
+		}
 	}
 	
 	@Override
