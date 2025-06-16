@@ -24,6 +24,7 @@ import net.wurstclient.WurstClient;
 import net.wurstclient.event.EventManager;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hacks.*;
+import net.wurstclient.hacks.massWhispering.MassWhisperHack;
 import net.wurstclient.util.json.JsonException;
 
 public final class HackList implements UpdateListener
@@ -34,6 +35,8 @@ public final class HackList implements UpdateListener
 	public final AntiAfkHack antiAfkHack = new AntiAfkHack();
 	public final AntiBlindHack antiBlindHack = new AntiBlindHack();
 	public final AntiCactusHack antiCactusHack = new AntiCactusHack();
+	public final AntiCrystalPlaceHack antiCrystalPlaceHack =
+		new AntiCrystalPlaceHack();
 	public final AntiEntityPushHack antiEntityPushHack =
 		new AntiEntityPushHack();
 	public final AntiHungerHack antiHungerHack = new AntiHungerHack();
@@ -50,6 +53,7 @@ public final class HackList implements UpdateListener
 		new CurrentPositionHack();
 	public final AutoLeaveHack autoLeaveHack = new AutoLeaveHack();
 	public final AutoLibrarianHack autoLibrarianHack = new AutoLibrarianHack();
+	public final LogoutSpotHack logoutSpotHack = new LogoutSpotHack();
 	public final AutoEatHack autoEatHack = new AutoEatHack();
 	public final AutoFarmHack autoFarmHack = new AutoFarmHack();
 	public final AutoFishHack autoFishHack = new AutoFishHack();
@@ -124,6 +128,7 @@ public final class HackList implements UpdateListener
 	public final LiquidsHack liquidsHack = new LiquidsHack();
 	public final LsdHack lsdHack = new LsdHack();
 	public final MaceDmgHack maceDmgHack = new MaceDmgHack();
+	public final MassWhisperHack massWhisperHack = new MassWhisperHack();
 	public final MassTpaHack massTpaHack = new MassTpaHack();
 	public final MileyCyrusHack mileyCyrusHack = new MileyCyrusHack();
 	public final MobEspHack mobEspHack = new MobEspHack();

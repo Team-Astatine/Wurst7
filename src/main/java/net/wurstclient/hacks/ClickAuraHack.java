@@ -103,7 +103,7 @@ public final class ClickAuraHack extends Hack
 			player.getMainHandStack().isOf(Items.MACE);
 		
 		int setAttackSpeed = isMainHandHoldingMace ? 40 : 0;
-		speed.setAttackSpeed(setAttackSpeed);
+		speed.setValue(setAttackSpeed);
 		
 		speed.updateTimer();
 		if(!speed.isTimeToAttack())
