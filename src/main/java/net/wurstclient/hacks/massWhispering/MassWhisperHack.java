@@ -132,8 +132,7 @@ public final class MassWhisperHack extends Hack
 		String target = players.get(index);
 		
 		MC.getNetworkHandler().sendChatCommand(
-			String.format("%s %s %s", command, target, comment)
-			);
+			String.format("%s %s %s", command, target, comment));
 		
 		index++;
 		timer = delay.getValueI() - 1;
