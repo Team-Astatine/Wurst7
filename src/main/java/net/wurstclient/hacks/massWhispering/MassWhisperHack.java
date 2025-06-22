@@ -137,12 +137,10 @@ public final class MassWhisperHack extends Hack
 		index++;
 		timer = delay.getValueI() - 1;
 		
-		// If we've messaged all players for this comment, remove the comment
-		// and reset index
 		if(index >= players.size())
 		{
-			message.poll();
 			index = 0;
+			message.poll();
 		}
 	}
 	
