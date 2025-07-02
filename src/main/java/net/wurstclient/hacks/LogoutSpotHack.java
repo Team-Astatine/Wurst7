@@ -105,6 +105,24 @@ public final class LogoutSpotHack extends Hack
 	@Override
 	public void onUpdate()
 	{
+		// MinecraftClient.getInstance().getNetworkHandler().getPlayerList().stream()
+		// 	.forEach(
+		// 		entry -> {
+		// 			UUID uuid = entry.getProfile().getId();
+		// 			String name = entry.getProfile().getName();
+		// 			System.out.println(String.format("online p -> %s, %s", name, uuid));
+		// 		}
+		// 	);
+		
+		// MC.world.getPlayers().parallelStream()
+		// 	.forEach(
+		// 		entry -> {
+		// 			UUID uuid = entry.getUuid();
+		// 			String name = entry.getName().getString();
+		// 			System.out.println(String.format("renderer p -> %s, %s", name, uuid));
+		// 		}
+		// 	);
+
 		// 온라인 플레이어 목록 (네트워크 탭 리스트)
 		onlinePlayers = MinecraftClient.getInstance().getNetworkHandler()
 			.getPlayerList().stream()
