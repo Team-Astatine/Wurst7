@@ -11,7 +11,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.wurstclient.Category;
@@ -40,7 +39,7 @@ public final class LogoutSpotHack extends Hack
 	
 	private record Entry(UUID uuid, Vec3d position, Instant instant)
 	{}
-
+	
 	private Map<UUID, String> onlinePlayers = new HashMap<>();
 	private Map<UUID, Vec3d> renderPlayers = new HashMap<>();
 	private Map<UUID, String> lastPlayers = new HashMap<>();
@@ -106,37 +105,36 @@ public final class LogoutSpotHack extends Hack
 	public void onUpdate()
 	{
 		// MinecraftClient.getInstance().getNetworkHandler().getPlayerList().stream()
-		// 	.forEach(
-		// 		entry -> {
-		// 			UUID uuid = entry.getProfile().getId();
-		// 			String name = entry.getProfile().getName();
-		// 			System.out.println(String.format("online p -> %s, %s", name, uuid));
-		// 		}
-		// 	);
+		// .forEach(
+		// entry -> {
+		// UUID uuid = entry.getProfile().getId();
+		// String name = entry.getProfile().getName();
+		// System.out.println(String.format("online p -> %s, %s", name, uuid));
+		// }
+		// );
 		
 		// MC.world.getPlayers().parallelStream()
-		// 	.forEach(
-		// 		entry -> {
-		// 			UUID uuid = entry.getUuid();
-		// 			String name = entry.getName().getString();
-		// 			System.out.println(String.format("renderer p -> %s, %s", name, uuid));
-		// 		}
-		// 	);
-
+		// .forEach(
+		// entry -> {
+		// UUID uuid = entry.getUuid();
+		// String name = entry.getName().getString();
+		// System.out.println(String.format("renderer p -> %s, %s", name,
+		// uuid));
+		// }
+		// );
+		
 		// 온라인 플레이어 목록 (네트워크 탭 리스트)
 		onlinePlayers = MinecraftClient.getInstance().getNetworkHandler()
 			.getPlayerList().stream()
-			.collect(Collectors.toMap(
-				entry -> entry.getProfile().getId(),
-				entry -> entry.getProfile().getName()
-				));
+			.collect(Collectors.toMap(entry -> entry.getProfile().getId(),
+				entry -> entry.getProfile().getName()));
 		
 		// client player 랑 이름이 같고 UUID 가 다른 경우 제거
 		UUID clientUuid = MC.player.getUuid();
 		String clientName = MC.player.getName().getString();
-		onlinePlayers.entrySet().removeIf(entry ->
-			entry.getValue().equals(clientName) && !entry.getKey().equals(clientUuid)
-			);
+		onlinePlayers.entrySet()
+			.removeIf(entry -> entry.getValue().equals(clientName)
+				&& !entry.getKey().equals(clientUuid));
 		
 		// 온라인 플레이어에 재접속한 경우, logOutPlayers에서 제거
 		logOutPlayers.entrySet()
@@ -163,7 +161,7 @@ public final class LogoutSpotHack extends Hack
 		}
 		
 		MC.player.getUuid();
-
+		
 		// 마지막에 lastPlayers를 onlinePlayers의 모든 UUID로 갱신
 		lastPlayers.clear();
 		lastPlayers = onlinePlayers;
