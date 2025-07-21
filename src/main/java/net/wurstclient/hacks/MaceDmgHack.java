@@ -24,8 +24,8 @@ import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.ChatUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @SearchTags({"mace dmg", "MaceDamage", "mace damage", "mace"})
 public final class MaceDmgHack extends Hack
@@ -38,7 +38,7 @@ public final class MaceDmgHack extends Hack
 	private final CheckboxSetting debuggingButton = new CheckboxSetting(
 		"Debugging", "description.wurst.setting.MaceDmg.Debugging", false);
 	
-	private List<Block> ignoreBlocks = new ArrayList<>();
+	private Set<Block> ignoreBlocks = new HashSet<>();
 	
 	public MaceDmgHack()
 	{
@@ -48,14 +48,9 @@ public final class MaceDmgHack extends Hack
 		addSetting(sqrtValue);
 		addSetting(debuggingButton);
 		
-		ignoreBlocks.add(Blocks.AIR);
-		ignoreBlocks.add(Blocks.WATER);
-		ignoreBlocks.add(Blocks.TALL_GRASS);
-		ignoreBlocks.add(Blocks.COBWEB);
-		ignoreBlocks.add(Blocks.VOID_AIR);
-		ignoreBlocks.add(Blocks.LAVA);
-		ignoreBlocks.add(Blocks.KELP);
-		ignoreBlocks.add(Blocks.KELP_PLANT);
+		ignoreBlocks = Set.of(Blocks.AIR, Blocks.VOID_AIR, Blocks.WATER,
+			Blocks.WATER_CAULDRON, Blocks.LAVA, Blocks.LAVA_CAULDRON,
+			Blocks.TALL_GRASS, Blocks.COBWEB, Blocks.KELP, Blocks.KELP_PLANT);
 	}
 	
 	@Override
